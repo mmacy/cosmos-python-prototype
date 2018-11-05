@@ -19,7 +19,7 @@ class UsersManagementMixin:
         pass
 
 
-class ContainerssManagementMixin:
+class ContainersManagementMixin:
     """
     Manage (create/list/query/get/delete) containers. 
     [Design note] Currently isolated into a mixin class to make it easier to move the functionality around
@@ -119,7 +119,7 @@ class Client:
         ]
 
 
-class Database(ContainerssManagementMixin, UsersManagementMixin):
+class Database(ContainersManagementMixin, UsersManagementMixin):
     """
     Azure Cosmos DB SQL Database
     """
