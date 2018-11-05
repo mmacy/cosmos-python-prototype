@@ -25,6 +25,7 @@ class ContainerssManagementMixin:
     [Design note] Currently isolated into a mixin class to make it easier to move the functionality around
                   in the object model. 
     """
+
     def create_container(self, id, options=None, **kwargs) -> "Container":
         """
         Keyword arguments:
@@ -36,7 +37,7 @@ class ContainerssManagementMixin:
         data = database._context.CreateContainer(
             database_link=database.database_link, collection=definition
         )
-        return Container(database, data['id'])
+        return Container(database, data["id"])
 
     def get_container(self, id):
         containers = self.list_containers(
@@ -61,30 +62,57 @@ class ContainerssManagementMixin:
 
 
 class Client:
+    """
+    CosmosDB SQL Client. This is the main entry point to the Cosmos DB object model.
+    """
+
     def __init__(self, url, key):
         self._context = _CosmosClient(url, dict(masterKey=key))
 
     def create_database(self, id: "str", fail_if_exists=False) -> "Database":
+        """
+        Create a new database
+        :param str id: Id of the database to crate.
+        :param bool fail_if_exists: If set to True and a database with the given `id` 
+        already exists, fail raise a `HTTPFailure`/status code 409. If a database with
+        the given id exists, and `fail_if_exists` is False, return the existing database.
+        """
         try:
             result = self._context.CreateDatabase(database=dict(id=id))
-            return Database(self, id=result['id'])
+            return Database(self, id=result["id"])
         except HTTPFailure as e:
             if fail_if_exists and e.status_code == 409:
                 raise
         return self.get_database(id)
 
     def get_database(self, id: "str") -> "Database":
+        """
+        Return the existing databse with the id `id. 
+        :param str id: Id of the new database.
+        """
         return Database(client=self, id=id)
 
     def list_databases(self) -> "Iterable[Database]":
+        """
+        Return an iterable of all existing databases.
+        """
         yield from [
             Database(self, database["id"]) for database in self._context.ReadDatabases()
         ]
 
     def delete_database(self, id: "str"):
+        """
+        Delete the database with the given id. Raises a HTTPError if 
+        the delete fails. 
+        :param str id: The database to delete. 
+        """
         self._context.DeleteDatabase(database_link="dbs/" + id)
 
-    def query_databases(self, query: "str") -> "Iterable[Database]":
+    def query_databases(self, query: "str") -> "Iterable[Database]": # TODO: Query should not just be a string
+        """
+        List databases matching the query `query`. 
+        :param str query: Cosmos DB SQL query
+        """
         yield from [
             Database(self, database["id"])
             for database in self._context.QueryDatabases(query)
@@ -92,21 +120,23 @@ class Client:
 
 
 class Database(ContainerssManagementMixin, UsersManagementMixin):
+    """
+    Azure Cosmos DB SQL Database
+    """
     def __init__(self, client: "Client", id: "str"):
+        """
+        :param Client client: Client from which this database was retreived. TODO: should we hide the client? Should it just be context?
+        :param str id: Id of the database
+        """
         self.client = client
         self._context = client._context
         self.id = id
-        if not type(id) is str:
-            raise ValueError()
         self.database_link = f"/dbs/{self.id}"
-
-    def __str__(self):
-        return "Database: " + str(dict(link=self.database_link, name=self.id))
 
 
 class Item(dict):
     def __init__(self, container: "Container", data: "Dict[str, Any]"):
-        self.container = container
+        self.container = container # TODO: Item instances (locally) probably shouldn't be directly tied to a collection
         self._context = container._context
         self.update(data)
 
@@ -128,7 +158,7 @@ class Container:
         conflict_resolution_policy=None,
     ):
         """
-        Update the properties of the container. Change will be persisted immediately. 
+        Update the properties of the container. Change will be persisted immediately. TODO: Should this be on the Database class?
         """
         parameters = {
             key: value
@@ -147,7 +177,7 @@ class Container:
         )
 
     @staticmethod
-    def document_link(item_or_link) -> "str":
+    def _document_link(item_or_link) -> "str":
         if type(item_or_link) is "str":
             return item_or_link
         else:
@@ -160,7 +190,9 @@ class Container:
 
     def list_items(self, options=None, cls=Item) -> "Iterable[Item]":
         options = options or {}
-        items = self._context.ReadItems(collection_link=self.collection_link, feed_options=options)
+        items = self._context.ReadItems(
+            collection_link=self.collection_link, feed_options=options
+        )
         yield from [cls(self, item) for item in items]
 
     def query_items(self, query: "str", cls=Item):
@@ -170,7 +202,7 @@ class Container:
         yield from [cls(self, item) for item in items]
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
-        item_link = Container.document_link(item)
+        item_link = Container._document_link(item)
         data = self._context.ReplaceItem(document_link=item_link, new_document=body)
         return Item(self, data)
 
@@ -187,7 +219,6 @@ class Container:
         return Item(self, result)
 
     def delete_item(self, item: "Item"):
-        document_link = Container.document_link(item)
+        document_link = Container._document_link(item)
         self._context.DeleteItem(document_link=document_link)
-
 
