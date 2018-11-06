@@ -1,4 +1,7 @@
-from typing import Any, Iterable, Optional, Dict, cast, Union, Tuple
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from typing import Any, Iterable, Optional, Dict, Union, Tuple
 
 
 from azure.cosmos.cosmos_client import CosmosClient as _CosmosClient
@@ -35,7 +38,7 @@ class ContainersManagementMixin:
         definition.update(kwargs)
         database = cast("Database", self)
         data = database._context.CreateContainer(
-            database_link=database.database_link, collection=definition
+            database_link=database.database_link, collection=definition, options=options
         )
         return Container(database, data["id"])
 
@@ -53,12 +56,21 @@ class ContainersManagementMixin:
 
     def list_containers(self, query=None) -> "Iterable[Container]":
         database = cast("Database", self)
-        yield from [
-            Container(database, container["id"])
-            for container in database._context.ReadContainers(
-                database_link=database.database_link
-            )
-        ]
+
+        if query:
+            yield from [
+                Container(database, container["id"])
+                for container in database._context.ReadContainers(
+                    database_link=database.database_link
+                )
+            ]
+        else:
+            yield from [
+                Container(database, container["id"])
+                for container in database._context.ReadContainers(
+                    database_link=database.database_link
+                )
+            ]
 
 
 class Client:
@@ -85,20 +97,34 @@ class Client:
                 raise
         return self.get_database(id)
 
-    def get_database(self, id: "str") -> "Database":
+    def get_database(
+        self, id: "str", metadata_handler=None) -> "Database":
         """
         Return the existing databse with the id `id. 
         :param str id: Id of the new database.
         """
-        return Database(client=self, id=id)
+        database = Database(client=self, id=id)
+        if metadata_handler is not None:
+            # TODO: This is super odd right now. Headers are stored on the client!
+            self._context.ReadDatabase(database.database_link)
+            metadata_handler(self._context.last_response_headers)
+        return database
 
-    def list_databases(self) -> "Iterable[Database]":
+    def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
         """
         Return an iterable of all existing databases.
+        :param str query: Cosmos DB SQL query. If omitted, all databases will be listed.
         """
-        yield from [
-            Database(self, database["id"]) for database in self._context.ReadDatabases()
-        ]
+        if query:
+            yield from [
+                Database(self, database["id"])
+                for database in self._context.QueryDatabases(query)
+            ]
+        else:
+            yield from [
+                Database(self, database["id"])
+                for database in self._context.ReadDatabases()
+            ]
 
     def delete_database(self, id: "str"):
         """
@@ -108,21 +134,12 @@ class Client:
         """
         self._context.DeleteDatabase(database_link="dbs/" + id)
 
-    def query_databases(self, query: "str") -> "Iterable[Database]": # TODO: Query should not just be a string
-        """
-        List databases matching the query `query`. 
-        :param str query: Cosmos DB SQL query
-        """
-        yield from [
-            Database(self, database["id"])
-            for database in self._context.QueryDatabases(query)
-        ]
-
 
 class Database(ContainersManagementMixin, UsersManagementMixin):
     """
     Azure Cosmos DB SQL Database
     """
+
     def __init__(self, client: "Client", id: "str"):
         """
         :param Client client: Client from which this database was retreived. TODO: should we hide the client? Should it just be context?
@@ -136,7 +153,10 @@ class Database(ContainersManagementMixin, UsersManagementMixin):
 
 class Item(dict):
     def __init__(self, container: "Container", data: "Dict[str, Any]"):
-        self.container = container # TODO: Item instances (locally) probably shouldn't be directly tied to a collection
+        super().__init__()
+        self.container = (
+            container
+        )  # TODO: Item instances (locally) probably shouldn't be directly tied to a collection
         self._context = container._context
         self.update(data)
 
@@ -145,10 +165,11 @@ class Container:
     def __init__(self, database: "Database", id: "str"):
         self.database = database
         self._context = database._context
+        self.session_token = None
         self.id = id
         self.collection_link = f"{database.database_link}/colls/{self.id}"
 
-    def set_container_properties(
+    def set_properties(
         self,
         *,
         id=None,
@@ -158,7 +179,8 @@ class Container:
         conflict_resolution_policy=None,
     ):
         """
-        Update the properties of the container. Change will be persisted immediately. TODO: Should this be on the Database class?
+        Update the properties of the container. Change will be persisted immediately.
+        TODO: Should this be on the database class?
         """
         parameters = {
             key: value
@@ -172,20 +194,34 @@ class Container:
             if value
             != None  # TODO: Questionable use - should use kwargs instead. Need to figure out best documentation for kwargs...
         }
-        result = self._context.ReplaceContainer(
-            self.collection_link, collection=parameters
-        )
+        self._context.ReplaceContainer(self.collection_link, collection=parameters)
+
+    def get_properties(self, force_refresh=False):
+        """
+        Get properties for of container. TODO: implement properly
+        """
+        pass
 
     @staticmethod
     def _document_link(item_or_link) -> "str":
-        if type(item_or_link) is "str":
+        if isinstance(item_or_link, str):
             return item_or_link
-        else:
-            return cast("str", cast("Item", item_or_link)["_self"])
+        return cast("str", cast("Item", item_or_link)["_self"])
 
-    def get_item(self, id: "str", cls=Item) -> "Item":
+    def get_item(self, id: "str", metadata_handler=None, cls=Item) -> "Item":
+        """
+        Get the item identified by `id`
+        :param str id: Id of item to retreive
+        :param callable metadata_handler: Optional method that will, if provided, receive an instance
+        of `CosmosCallMetadata` representing metadata about the operation (RSU cost etc.)
+        :returns: Item if present. TODO: General guidelines is to throw rather than returning None. 
+        """
         doc_link = f"{self.collection_link}/docs/{id}"
         result = self._context.ReadItem(document_link=doc_link)
+        headers = self._context.last_response_headers
+        if metadata_handler:  # TODO: Create strongly typed object for options
+            metadata_handler(headers)
+        self.session_token = headers.get("x-ms-session-token", self.session_token)
         return cls(container=self, data=result)
 
     def list_items(self, options=None, cls=Item) -> "Iterable[Item]":

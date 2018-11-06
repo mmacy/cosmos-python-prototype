@@ -9,13 +9,12 @@ TEST_DB_NAME = "johanste-testdb"
 
 
 class DatabaseManagement:
-
     @staticmethod
     def find_database(client, id):
-        print('1. Query for database')
+        print("1. Query for database")
         databases = list(
-            client.query_databases(
-                dict(
+            client.list_databases(
+                query=dict(
                     query="SELECT * FROM r WHERE r.id=@id",
                     parameters=[dict(name="@id", value=id)],
                 )
@@ -28,38 +27,39 @@ class DatabaseManagement:
 
     @staticmethod
     def create_database(client, id):
-        print('2. Create database')
+        print("2. Create database")
         try:
             database = client.create_database(id, fail_if_exists=True)
-            print(f'A database with id {id} created')
+            print(f"A database with id {id} created")
         except HTTPFailure as e:
             if e.status_code == 409:
-                print(f'A database with id {id} already exists')
+                print(f"A database with id {id} already exists")
             else:
                 raise
 
     @staticmethod
     def read_database(client, id):
-        print('3. Get a database by id')
+        print("3. Get a database by id")
         database = client.get_database(id)
 
     @staticmethod
     def list_databases(client):
-        print('4. Listing all databases on an account')
+        print("4. Listing all databases on an account")
         databases = client.list_databases()
         for database in databases:
             print(database.id)
 
     @staticmethod
     def delete_database(client, id):
-        print('5. Delete database')
+        print("5. Delete database")
         try:
             client.delete_database(id)
         except HTTPFailure as e:
             if e.status_code == 404:
-                print(f'A database with id {id} does not exist')
+                print(f"A database with id {id} does not exist")
             else:
                 raise
+
 
 client = prototype.Client(AUTH_URL, AUTH_KEY)
 DatabaseManagement.find_database(client, TEST_DB_NAME)

@@ -56,7 +56,7 @@ class DocumentManagement:
 
         # Note that Reads require a partition key to be spcified. This can be skipped if your collection is not
         # partitioned i.e. does not have a partition key definition during creation.
-        response = container.get_item(id)
+        response = container.get_item(id, metadata_handler=lambda headers: print(headers))
 
         print('Document read by Id {0}'.format(id))
         print('Account Number: {0}'.format(response.get('account_number')))
