@@ -22,6 +22,57 @@ class UsersManagementMixin:
         pass
 
 
+class StoredProceduresMixin:
+    def list_stored_procedures(self, query):
+        pass
+
+    def get_stored_procedure(self, id):
+        pass
+
+    def create_stored_procedure(self):
+        pass
+
+    def upsert_stored_procedure(self, trigger):
+        pass
+
+    def delete_stored_procedure(self):
+        pass
+
+
+class TriggersMixin:
+    def list_triggers(self, query):
+        pass
+
+    def get_trigger(self, id):
+        pass
+
+    def create_trigger(self):
+        pass
+
+    def upsert_trigger(self, trigger):
+        pass
+
+    def delete_trigger(self):
+        pass
+
+
+class UserDefinedFunctionsMixin:
+    def list_user_defined_functions(self, query):
+        pass
+
+    def get_user_defined_function(self, id):
+        pass
+
+    def create_user_defined_function(self):
+        pass
+
+    def upsert_user_defined_function(self, trigger):
+        pass
+
+    def delete_user_defined_function(self):
+        pass
+
+
 class ContainersManagementMixin:
     """
     Manage (create/list/query/get/delete) containers. 
@@ -31,6 +82,7 @@ class ContainersManagementMixin:
 
     def create_container(self, id, options=None, **kwargs) -> "Container":
         """
+        :param str id: Id of container to create
         Keyword arguments:
         partitionKey, indexingPolicy, defaultTtl, conflictResolutionPolicy
         """
@@ -41,6 +93,14 @@ class ContainersManagementMixin:
             database_link=database.database_link, collection=definition, options=options
         )
         return Container(database, data["id"])
+
+    def delete_container(self, container_or_id):
+        database = cast("Database", self)
+        if isinstance(container_or_id, str):
+            container = Container(database, container_or_id)
+        else:
+            container = container_or_id
+        database._context.DeleteContainer(container.collection_link)
 
     def get_container(self, id):
         containers = self.list_containers(
@@ -97,16 +157,17 @@ class Client:
                 raise
         return self.get_database(id)
 
-    def get_database(
-        self, id: "str", metadata_handler=None) -> "Database":
+    def get_database(self, id: "str", metadata_handler=None) -> "Database":
         """
-        Return the existing databse with the id `id. 
+        Return the existing database with the id `id. 
         :param str id: Id of the new database.
+        :param callable metadata_handler: Optional method that will, if provided, receive an instance
+        of `CosmosCallMetadata` representing metadata about the operation (RSU cost etc.)
         """
         database = Database(client=self, id=id)
         if metadata_handler is not None:
-            # TODO: This is super odd right now. Headers are stored on the client!
             self._context.ReadDatabase(database.database_link)
+            # TODO: Parse last response headers into strongly typed object
             metadata_handler(self._context.last_response_headers)
         return database
 
@@ -161,7 +222,7 @@ class Item(dict):
         self.update(data)
 
 
-class Container:
+class Container(UserDefinedFunctionsMixin, TriggersMixin, StoredProceduresMixin):
     def __init__(self, database: "Database", id: "str"):
         self.database = database
         self._context = database._context
