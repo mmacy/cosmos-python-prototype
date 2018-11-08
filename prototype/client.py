@@ -213,12 +213,13 @@ class Database(ContainersManagementMixin, UsersManagementMixin):
 
 
 class Item(dict):
-    def __init__(self, container: "Container", data: "Dict[str, Any]"):
+    def __init__(self, container: "Container", headers: "Dict[str, Any]", data: "Dict[str, Any]"):
         super().__init__()
         self.container = (
             container
         )  # TODO: Item instances (locally) probably shouldn't be directly tied to a collection
         self._context = container._context
+        self.response_headers = headers
         self.update(data)
 
 
@@ -283,37 +284,39 @@ class Container(UserDefinedFunctionsMixin, TriggersMixin, StoredProceduresMixin)
         if metadata_handler:  # TODO: Create strongly typed object for options
             metadata_handler(headers)
         self.session_token = headers.get("x-ms-session-token", self.session_token)
-        return cls(container=self, data=result)
+        return cls(container=self, headers=self._context.last_response_headers, data=result)
 
     def list_items(self, options=None, cls=Item) -> "Iterable[Item]":
         options = options or {}
         items = self._context.ReadItems(
             collection_link=self.collection_link, feed_options=options
         )
-        yield from [cls(self, item) for item in items]
+        headers = self._context.last_response_headers
+        yield from [cls(self, headers=headers, data=item) for item in items]
 
     def query_items(self, query: "str", cls=Item):
         items = self._context.QueryItems(
             database_or_Container_link=self.collection_link, query=query
         )
-        yield from [cls(self, item) for item in items]
+        headers = self._context.last_response_headers
+        yield from [cls(self, headers, item) for item in items]
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
         item_link = Container._document_link(item)
         data = self._context.ReplaceItem(document_link=item_link, new_document=body)
-        return Item(self, data)
+        return Item(self, headers=self._context.last_response_headers, data=data)
 
     def upsert_item(self, body: "Dict[str, Any]") -> "Item":
         result = self._context.UpsertItem(
             database_or_Container_link=self.collection_link, document=body
         )
-        return Item(self, result)
+        return Item(self, headers=self._context.last_response_headers, data=result)
 
     def create_item(self, body: "Dict[str,str]") -> "Item":
         result = self._context.CreateItem(
             database_or_Container_link=self.collection_link, document=body
         )
-        return Item(self, result)
+        return Item(self, headers=self._context.last_response_headers, data=result)
 
     def delete_item(self, item: "Item"):
         document_link = Container._document_link(item)
