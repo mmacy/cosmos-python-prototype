@@ -1,11 +1,11 @@
 # Sample code
 import os
 
-import client as prototype
+from azure.cosmos import CosmosClient
 
 AUTH_URL = os.environ.get("ACCOUNT_HOST")
 AUTH_KEY = os.environ.get("ACCOUNT_KEY")
-client = prototype.Client(url=AUTH_URL, key=AUTH_KEY)
+client = CosmosClient(url=AUTH_URL, key=AUTH_KEY)
 
 def do_basic_stuff():
     for database in client.list_databases():
