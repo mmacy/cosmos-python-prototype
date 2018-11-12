@@ -22,7 +22,7 @@ except HTTPFailure as e:
 ####
 
 # In order to retreive a container where you know the database name and container name:
-container = Container(client.client_session, database=test_database_name, id=test_container_name)
+container = Container(client.client_context, database=test_database_name, id=test_container_name)
 container.upsert_item({
     'id': 'something',
     'value': 'else'
@@ -57,6 +57,9 @@ for i in range(1, 10):
         )
     )
 
+database.set_container_properties(container, default_ttl=10)
+container = database.get_container(container)
+print(container)
 # You can also modify one of the existing items
 item = items[0]
 item['firstName'] = 'Some Other Name'
