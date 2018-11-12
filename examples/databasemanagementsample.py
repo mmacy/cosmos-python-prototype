@@ -1,7 +1,6 @@
 import os
 
-import client as prototype
-from azure.cosmos.errors import HTTPFailure
+from azure.cosmos import CosmosClient, HTTPFailure
 
 AUTH_URL = os.environ.get("ACCOUNT_HOST")
 AUTH_KEY = os.environ.get("ACCOUNT_KEY")
@@ -61,7 +60,7 @@ class DatabaseManagement:
                 raise
 
 
-client = prototype.Client(AUTH_URL, AUTH_KEY)
+client = CosmosClient(AUTH_URL, AUTH_KEY)
 DatabaseManagement.find_database(client, TEST_DB_NAME)
 DatabaseManagement.create_database(client, TEST_DB_NAME)
 DatabaseManagement.read_database(client, TEST_DB_NAME)

@@ -1,6 +1,4 @@
-from azure.cosmos.errors import HTTPFailure
-
-from client import Client as CosmosClient, Container
+from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
 
 # It all starts with a client instance:
 import os

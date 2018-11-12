@@ -1,9 +1,7 @@
 import os
-
-import azure.cosmos.errors as errors
 import datetime
 
-import client as prototype
+from azure.cosmos import CosmosClient, HTTPFailure
 
 # ----------------------------------------------------------------------------------------------------------
 # Prerequistes - 
@@ -38,7 +36,7 @@ class DocumentManagement:
         sales_order = DocumentManagement.GetSalesOrder("SalesOrder1")
         try:
             container.create_item(sales_order)
-        except errors.HTTPFailure as e:
+        except HTTPFailure as e:
             if e.status_code == 409:
                 print('Document with id "{}" already exists'.format(sales_order['id']))
         # As your app evolves, let's say your object has a new schema. You can insert SalesOrderV2 objects without any 
@@ -46,7 +44,7 @@ class DocumentManagement:
         sales_order2 = DocumentManagement.GetSalesOrderV2("SalesOrder2")
         try:
             container.create_item(sales_order2)
-        except errors.HTTPFailure as e:
+        except HTTPFailure as e:
             if e.status_code == 409:
                 print('Document with id {} already exists'.format(sales_order['id']))
 
@@ -134,7 +132,7 @@ def run_sample():
     DATABASE_ID = 'testdocumentmanagementdb'
     CONTAINER_ID = 'testdocumentmanagementcollection'
 
-    client = prototype.Client(AUTH_URL, AUTH_KEY)
+    client = CosmosClient(AUTH_URL, AUTH_KEY)
     database = client.create_database(id=DATABASE_ID)
     try:
         container = database.create_container(id=CONTAINER_ID)

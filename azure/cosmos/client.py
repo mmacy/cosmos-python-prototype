@@ -4,8 +4,8 @@ Cosmos client Pythonidae
 from typing import Any, Iterable, Optional, Dict, Union, Tuple, cast, overload
 
 
-from azure.internal_cosmos.cosmos_client import CosmosClient as _CosmosClient
-from azure.internal_cosmos.errors import HTTPFailure
+from internal.cosmos.cosmos_client import CosmosClient as _CosmosClient
+from internal.cosmos.errors import HTTPFailure
 
 
 class ClientContext(_CosmosClient):
