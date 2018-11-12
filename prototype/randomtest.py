@@ -25,7 +25,8 @@ except ValueError:  # TODO: What is the appropriate exception here?
 
 import time
 
-container.set_container_properties(default_ttl=time.time() + 60 * 60)
+
+database.set_container_properties(container, default_ttl=time.time() + 60 * 60)
 
 def upload():
     import glob
