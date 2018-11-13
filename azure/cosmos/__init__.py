@@ -80,8 +80,8 @@ class CosmosClient:
     ...
     """
 
-    def __init__(self, url, key):
-        self.client_context = ClientContext(url, dict(masterKey=key))
+    def __init__(self, url, key, consistency_level='Session'):
+        self.client_context = ClientContext(url, dict(masterKey=key), consistency_level=consistency_level)
 
     def create_database(self, id: "str", fail_if_exists=False) -> "Database":
         """ Create a new database with the given name (id)
@@ -352,12 +352,25 @@ class Container(UserDefinedFunctionsMixin, TriggersMixin, StoredProceduresMixin)
         headers = self.client_context.last_response_headers
         yield from [Item(headers=headers, data=item) for item in items]
 
+    def query_items_change_feed(self, options=None):
+        items = self.client_context.QueryItemsChangeFeed(
+            self.collection_link, options=options
+        )
+        headers = self.client_context.last_response_headers
+        yield from [Item(headers, item) for item in items]
+
     def query_items(
-        self, query: "str", options=None, partition_key: "Optional[str]" = None
+        self,
+        query: "str",
+        parameters=None,
+        options=None,
+        partition_key: "Optional[str]" = None,
     ) -> "Iterable[Item]":
         items = self.client_context.QueryItems(
             database_or_Container_link=self.collection_link,
-            query=query,
+            query=query
+            if parameters is None
+            else dict(query=query, parameters=parameters),
             options=options,
             partition_key=partition_key,
         )
