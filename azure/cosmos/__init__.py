@@ -1,3 +1,9 @@
+__all__ = [
+    "CosmosClient",
+    "Database",
+    "Container",
+    "Item"
+]
 from internal.cosmos.errors import HTTPFailure
 
 """
@@ -18,22 +24,30 @@ class User:
     pass
 
 
-
 class CosmosClient:
     """
     CosmosDB SQL Client. This is the main entry point to the Cosmos DB object model.
-
-    >>> import os
-    >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-    >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-    >>> client = Client(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
-    ...
     """
 
-    def __init__(self, url, key, consistency_level="Session"):
+    def __init__(self, url: "str", key, consistency_level="Session"):
+        """ Instantiate a new CosmosClient.
+
+        :param url: The URL of the cosmos account. 
+
+        >>> import os
+        >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
+        >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
+        >>> client = Client(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+        ...
+
+        """
         self.client_context = ClientContext(
             url, dict(masterKey=key), consistency_level=consistency_level
         )
+
+    @staticmethod
+    def _get_database_link(database_or_id: "Union[str, Database]") -> "str":
+        return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
     def create_database(self, id: "str", fail_if_exists=False) -> "Database":
         """ Create a new database with the given name (id)
@@ -62,23 +76,26 @@ class CosmosClient:
                 raise
         return self.get_database(id)
 
-    def get_database(self, id: "str") -> "DatabaseResponse":
+    def get_database(self, database: "Union[str, Database]") -> "DatabaseResponse":
         """
         Retreive the existing database with the id (name) `id`. 
 
         :param id: Id of the new database.
         :raise HTTPError: If the given database couldn't be retrieved.
         """
-        properties = self.client_context.ReadDatabase(database_link=f"dbs/{id}")
-        database = DatabaseResponse(self.client_context, id, properties)
-        return database
+        database_link = CosmosClient._get_database_link(database)
+        properties = self.client_context.ReadDatabase(database_link)
+        return DatabaseResponse(self.client_context, properties["id"], properties)
 
-    def get_database_properties(self, id: "str"):
-        """ Get the database properties 
-
-        :param id: Id (or name) of the database to retrieve properties for.
+    def get_database_properties(self, database: "Union[Database, str]"):
         """
-        properties = self.client_context.ReadDatabase(id)
+        Get the database properties 
+
+        :param database: Id (or name) of the database to retrieve properties for.
+        :raise HTTPError: If the database cannot be retreived from the server.
+        """
+        database_link = CosmosClient._get_database_link(database)
+        properties = self.client_context.ReadDatabase(database_link)
         return properties
 
     def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
@@ -165,20 +182,31 @@ class Database:
         )
         properties = self.client_context.DeleteContainer(collection_link)
 
-    def get_container(
-        self, container_or_id: "Union[str, Container]"
-    ) -> "ContainerResponse":
+    def get_container(self, container: "Union[str, Container]") -> "ContainerResponse":
+        """ Get the container with the id (name) `container`. 
+
+        :param container: The id (name) of the continer, or a container instance.
+
+        .. code
+            database = client.get_database('fabrikamdb')
+            container = database.get_container('customers')
+        """
         collection_link = getattr(
-            container_or_id,
-            "collection_link",
-            f"{self.database_link}/colls/{container_or_id}",
+            container, "collection_link", f"{self.database_link}/colls/{container}"
         )
-        container = self.client_context.ReadContainer(collection_link)
+        container_properties = self.client_context.ReadContainer(collection_link)
         return ContainerResponse(
-            self.client_context, self, container["id"], properties=container
+            self.client_context,
+            self,
+            container_properties["id"],
+            properties=container_properties,
         )
 
     def list_containers(self, query=None) -> "Iterable[ContainerResponse]":
+        """ List the containers in this database.
+
+        :param query: If provided, query used to filter which containers to return. If omitted returns all containers.
+        """
         if query:
             yield from [
                 ContainerResponse(self.client_context, self, container["id"], container)
@@ -403,7 +431,6 @@ class Container:
 
     def delete_user_defined_function(self):
         pass
-
 
 
 class ContainerResponse(Container):
