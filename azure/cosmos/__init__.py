@@ -18,56 +18,6 @@ class User:
     pass
 
 
-class StoredProceduresMixin:
-    def list_stored_procedures(self, query):
-        pass
-
-    def get_stored_procedure(self, id):
-        pass
-
-    def create_stored_procedure(self):
-        pass
-
-    def upsert_stored_procedure(self, trigger):
-        pass
-
-    def delete_stored_procedure(self):
-        pass
-
-
-class TriggersMixin:
-    def list_triggers(self, query):
-        pass
-
-    def get_trigger(self, id):
-        pass
-
-    def create_trigger(self):
-        pass
-
-    def upsert_trigger(self, trigger):
-        pass
-
-    def delete_trigger(self):
-        pass
-
-
-class UserDefinedFunctionsMixin:
-    def list_user_defined_functions(self, query):
-        pass
-
-    def get_user_defined_function(self, id):
-        pass
-
-    def create_user_defined_function(self):
-        pass
-
-    def upsert_user_defined_function(self, trigger):
-        pass
-
-    def delete_user_defined_function(self):
-        pass
-
 
 class CosmosClient:
     """
@@ -80,8 +30,10 @@ class CosmosClient:
     ...
     """
 
-    def __init__(self, url, key, consistency_level='Session'):
-        self.client_context = ClientContext(url, dict(masterKey=key), consistency_level=consistency_level)
+    def __init__(self, url, key, consistency_level="Session"):
+        self.client_context = ClientContext(
+            url, dict(masterKey=key), consistency_level=consistency_level
+        )
 
     def create_database(self, id: "str", fail_if_exists=False) -> "Database":
         """ Create a new database with the given name (id)
@@ -158,7 +110,13 @@ class CosmosClient:
 
 class Database:
     """
-    Azure Cosmos DB SQL Database
+    Represents an Azure Cosmos Database.
+
+    A database contains one or more collections, each of which can contain stored procedures, 
+    triggers, user defined functions.
+
+    A database also has associated users, each with a set of permissions to access various 
+    other collections, stored procedures, triggers, user defined functions, or items
     """
 
     def __init__(self, client_context: "ClientContext", id: "str"):
@@ -172,8 +130,9 @@ class Database:
 
     def create_container(self, id, options=None, **kwargs) -> "ContainerResponse":
         """
-        Create a new container with the given id (name). If a container with the given
-        id (name) already exists, an HTTPError will be raised.
+        Create a new container with the given id (name). 
+        
+        If a container with the given id (name) already exists, an HTTPError will be raised.
 
         :param str id: Id of container to create
         :raise HTTPError:
@@ -311,7 +270,7 @@ class Item(dict):
         self.update(data)
 
 
-class Container(UserDefinedFunctionsMixin, TriggersMixin, StoredProceduresMixin):
+class Container:
     def __init__(
         self,
         client_context: "ClientContext",
@@ -399,6 +358,52 @@ class Container(UserDefinedFunctionsMixin, TriggersMixin, StoredProceduresMixin)
     def delete_item(self, item: "Item") -> "None":
         document_link = Container._document_link(item)
         self.client_context.DeleteItem(document_link=document_link)
+
+    def list_stored_procedures(self, query):
+        pass
+
+    def get_stored_procedure(self, id):
+        pass
+
+    def create_stored_procedure(self):
+        pass
+
+    def upsert_stored_procedure(self, trigger):
+        pass
+
+    def delete_stored_procedure(self):
+        pass
+
+    def list_triggers(self, query):
+        pass
+
+    def get_trigger(self, id):
+        pass
+
+    def create_trigger(self):
+        pass
+
+    def upsert_trigger(self, trigger):
+        pass
+
+    def delete_trigger(self):
+        pass
+
+    def list_user_defined_functions(self, query):
+        pass
+
+    def get_user_defined_function(self, id):
+        pass
+
+    def create_user_defined_function(self):
+        pass
+
+    def upsert_user_defined_function(self, trigger):
+        pass
+
+    def delete_user_defined_function(self):
+        pass
+
 
 
 class ContainerResponse(Container):
