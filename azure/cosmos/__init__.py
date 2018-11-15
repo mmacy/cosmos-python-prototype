@@ -34,7 +34,7 @@ class CosmosClient:
         >>> import os
         >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
         >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-        >>> client = Client(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+        >>> client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
         ...
 
         """
@@ -58,7 +58,7 @@ class CosmosClient:
         >>> import os
         >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
         >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-        >>> client = Client(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+        >>> client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
         >>> database = client.create_database('nameofdatabase')        
         ...
 
@@ -363,6 +363,12 @@ class Container:
         options=None,
         partition_key: "Optional[str]" = None,
     ) -> "Iterable[Item]":
+        """Return any items matching the given `query`.
+
+        .. code::
+
+            print('hello')
+        """
         items = self.client_context.QueryItems(
             database_or_Container_link=self.collection_link,
             query=query
@@ -388,6 +394,12 @@ class Container:
         return Item(headers=self.client_context.last_response_headers, data=result)
 
     def create_item(self, body: "Dict[str, Any]") -> "Item":
+        """ Create an item in the container.
+
+        :param body: A dict-like object or string representing the item to create.
+        :raises HTTPError: 
+        In order to replace an existing item, use the `Collection.upsert_item` method.
+        """
         result = self.client_context.CreateItem(
             database_or_Container_link=self.collection_link, document=body
         )
