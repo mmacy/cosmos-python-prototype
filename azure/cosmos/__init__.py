@@ -1,9 +1,6 @@
-__all__ = [
-    "CosmosClient",
-    "Database",
-    "Container",
-    "Item"
-]
+__all__ = ["CosmosClient", "Database", "Container", "Item"]
+
+
 from internal.cosmos.errors import HTTPFailure
 
 """
@@ -68,7 +65,7 @@ class CosmosClient:
         """
         try:
             result = self.client_context.CreateDatabase(database=dict(id=id))
-            return DatabaseResponse(
+            return DatabaseReference(
                 self.client_context, id=result["id"], properties=result
             )
         except HTTPFailure as e:
@@ -76,7 +73,7 @@ class CosmosClient:
                 raise
         return self.get_database(id)
 
-    def get_database(self, database: "Union[str, Database]") -> "DatabaseResponse":
+    def get_database(self, database: "Union[str, Database]") -> "DatabaseReference":
         """
         Retreive the existing database with the id (name) `id`. 
 
@@ -85,7 +82,7 @@ class CosmosClient:
         """
         database_link = CosmosClient._get_database_link(database)
         properties = self.client_context.ReadDatabase(database_link)
-        return DatabaseResponse(self.client_context, properties["id"], properties)
+        return DatabaseReference(self.client_context, properties["id"], properties)
 
     def get_database_properties(self, database: "Union[Database, str]"):
         """
@@ -106,23 +103,24 @@ class CosmosClient:
         """
         if query:
             yield from [
-                DatabaseResponse(self.client_context, properties["id"], properties)
+                DatabaseReference(self.client_context, properties["id"], properties)
                 for properties in self.client_context.QueryDatabases(query)
             ]
         else:
             yield from [
-                DatabaseResponse(self.client_context, properties["id"], properties)
+                DatabaseReference(self.client_context, properties["id"], properties)
                 for properties in self.client_context.ReadDatabases()
             ]
 
-    def delete_database(self, id: "str"):
+    def delete_database(self, database: "Union[Database, str]"):
         """
         Delete the database with the given id.
 
-        :param id: The id (name) of the database to delete. 
+        :param database: The id (name) of or database instance to delete. 
         :raise azure.cosmos.HTTPError: If the call to delete the database fails.
         """
-        self.client_context.DeleteDatabase(database_link=f"dbs/{id}")
+        database_link = CosmosClient._get_database_link(database)
+        self.client_context.DeleteDatabase(database_link)
 
 
 class Database:
@@ -143,9 +141,16 @@ class Database:
         """
         self.client_context = client_context
         self.id = id
-        self.database_link = f"/dbs/{self.id}"
+        self.database_link = CosmosClient._get_database_link(id)
 
-    def create_container(self, id, options=None, **kwargs) -> "ContainerResponse":
+    def _get_container_link(self, container_or_id: "Union[str, Container]") -> "str":
+        return getattr(
+            container_or_id,
+            "collection_link",
+            f"{self.database_link}/colls/{container_or_id}",
+        )
+
+    def create_container(self, id, options=None, **kwargs) -> "ContainerReference":
         """
         Create a new container with the given id (name). 
         
@@ -162,7 +167,9 @@ class Database:
         data = self.client_context.CreateContainer(
             database_link=self.database_link, collection=definition, options=options
         )
-        return ContainerResponse(self.client_context, self, data["id"], properties=data)
+        return ContainerReference(
+            self.client_context, self, data["id"], properties=data
+        )
 
     @overload
     def delete_container(self, container: "str"):
@@ -172,22 +179,21 @@ class Database:
     def delete_container(self, container: "Container"):
         ...
 
-    def delete_container(self, container):
+    def delete_container(self, container: "Union[str, Container]"):
         """ Delete the container
 
         :param container: The container to delete. 
         """
-        collection_link = getattr(
-            container, "collection_link", f"{self.database_link}/colls/{container}"
-        )
+        collection_link = self._get_container_link(container)
         properties = self.client_context.DeleteContainer(collection_link)
 
-    def get_container(self, container: "Union[str, Container]") -> "ContainerResponse":
+    def get_container(self, container: "Union[str, Container]") -> "ContainerReference":
         """ Get the container with the id (name) `container`. 
 
         :param container: The id (name) of the continer, or a container instance.
 
-        .. code
+        .. code-block:: python
+
             database = client.get_database('fabrikamdb')
             container = database.get_container('customers')
         """
@@ -195,28 +201,32 @@ class Database:
             container, "collection_link", f"{self.database_link}/colls/{container}"
         )
         container_properties = self.client_context.ReadContainer(collection_link)
-        return ContainerResponse(
+        return ContainerReference(
             self.client_context,
             self,
             container_properties["id"],
             properties=container_properties,
         )
 
-    def list_containers(self, query=None) -> "Iterable[ContainerResponse]":
+    def list_containers(self, query=None) -> "Iterable[ContainerReference]":
         """ List the containers in this database.
 
         :param query: If provided, query used to filter which containers to return. If omitted returns all containers.
         """
         if query:
             yield from [
-                ContainerResponse(self.client_context, self, container["id"], container)
+                ContainerReference(
+                    self.client_context, self, container["id"], container
+                )
                 for container in self.client_context.ReadContainers(
                     database_link=self.database_link
                 )
             ]
         else:
             yield from [
-                ContainerResponse(self.client_context, self, container["id"], container)
+                ContainerReference(
+                    self.client_context, self, container["id"], container
+                )
                 for container in self.client_context.ReadContainers(
                     database_link=self.database_link
                 )
@@ -283,7 +293,7 @@ class Database:
         database.client_context.DeleteUser(self.get_user_link(id))
 
 
-class DatabaseResponse(Database):
+class DatabaseReference(Database):
     def __init__(
         self, client_context: "ClientContext", id: "str", properties: "Dict[str, Any]"
     ):
@@ -433,7 +443,13 @@ class Container:
         pass
 
 
-class ContainerResponse(Container):
+class ContainerReference(Container):
+    """ A container reference is a reference to an existing container.
+
+    Instances of this class are not created directly; they are retrieved from the
+    containing database's get/query/create_container methods.
+    """
+
     def __init__(
         self,
         client_context: "ClientContext",

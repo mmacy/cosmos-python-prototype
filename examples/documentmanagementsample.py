@@ -137,10 +137,10 @@ def run_sample():
     try:
         container = database.create_container(id=CONTAINER_ID)
         print(f'Container with id "{CONTAINER_ID}"" created')
-    except errors.HTTPFailure as e:
+    except HTTPFailure as e:
         if e.status_code == 409:
-            print(f'Container with id {DATABASE_ID} already exists')
-            container = database.get_container(id=DATABASE_ID)
+            print(f'Container with id {CONTAINER_ID} already exists')
+            container = database.get_container(container=CONTAINER_ID)
         else:
             raise
 
@@ -149,7 +149,7 @@ def run_sample():
     DocumentManagement.read_document(container,'SalesOrder1')
     DocumentManagement.read_documents(container)
 
-    client.delete_database(id=DATABASE_ID)
+    client.delete_database(database=DATABASE_ID)
     print("\nrun_sample done")
 
 if __name__ == '__main__':
