@@ -48,7 +48,7 @@ class CosmosClient:
     def _get_database_link(database_or_id: "Union[str, Database]") -> "str":
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
-    def create_database(self, id: "str", fail_if_exists: "bool"=False) -> "Database":
+    def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
         """ Create a new database with the given name (id)
 
         :param id: Id (name) of the database to create.
@@ -152,7 +152,15 @@ class Database:
             f"{self.database_link}/colls/{container_or_id}",
         )
 
-    def create_container(self, id, options=None, *, partition_key:"str"=None, indexing_policy:"Optional[Dict[str, Any]]"=None, default_ttl:"int"=None) -> "Container":
+    def create_container(
+        self,
+        id,
+        options=None,
+        *,
+        partition_key: "str" = None,
+        indexing_policy: "Optional[Dict[str, Any]]" = None,
+        default_ttl: "int" = None,
+    ) -> "Container":
         """
         Create a new container with the given id (name). 
         
@@ -186,12 +194,12 @@ class Database:
         
         """
         definition = dict(id=id)
-        if partition_key: 
-            definition['partitionKey'] = partition_key
+        if partition_key:
+            definition["partitionKey"] = partition_key
         if indexing_policy:
-            definition['indexingPolicy'] = indexing_policy
+            definition["indexingPolicy"] = indexing_policy
         if default_ttl:
-            definition['defaultTtl'] = default_ttl
+            definition["defaultTtl"] = default_ttl
 
         data = self.client_context.CreateContainer(
             database_link=self.database_link, collection=definition, options=options
@@ -220,11 +228,18 @@ class Database:
         """ Get the container with the id (name) `container`. 
 
         :param container: The id (name) of the continer, or a container instance.
+        :raise `HTTPFailure`: Raised if the client was unable to get the container. This includes if the container does not exist.
 
         .. code-block:: python
 
             database = client.get_database('fabrikamdb')
-            container = database.get_container('customers')
+            try:
+                container = database.get_container('customers')
+            except HTTPFailure as failure:
+                if failure.status_code == 404:
+                    print('Container did not exist...')
+                else:
+                    print(f'Failed to retrieve container - status code:{failure.status_code}')
         """
         collection_link = getattr(
             container, "collection_link", f"{self.database_link}/colls/{container}"
@@ -237,18 +252,24 @@ class Database:
             properties=container_properties,
         )
 
-    def list_containers(self, query=None) -> "Iterable[ContainerReference]":
+    def list_containers(self, query:"str"=None, parameters=None) -> "Iterable[ContainerReference]":
         """ List the containers in this database.
 
         :param query: If provided, query used to filter which containers to return. If omitted returns all containers.
+        :param parameters: Parameters to query. Only applicable of a query has been specified.
+        .. code-block:: python
+
+            database.list_containers()
         """
         if query:
             yield from [
                 ContainerReference(
                     self.client_context, self, container["id"], container
                 )
-                for container in self.client_context.ReadContainers(
-                    database_link=self.database_link
+                for container in self.client_context.QueryContainers(
+                    query=query
+                    if parameters is None
+                    else dict(query=query, parameters=parameters),
                 )
             ]
         else:
@@ -338,6 +359,7 @@ class Item(dict):
 class Container:
     """ An Azure Cosmos SQL Container
     """
+
     def __init__(
         self,
         client_context: "ClientContext",
@@ -388,7 +410,7 @@ class Container:
     def query_items(
         self,
         query: "str",
-        parameters:"Optional[List]"=None,
+        parameters: "Optional[List]" = None,
         options=None,
         partition_key: "Optional[str]" = None,
     ) -> "Iterable[Item]":
