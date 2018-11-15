@@ -1,10 +1,10 @@
 # Sample code
 import os
 
-from azure.cosmos import CosmosClient
+from azure.cosmos import CosmosClient, HTTPFailure
 
-AUTH_URL = os.environ.get("ACCOUNT_HOST")
-AUTH_KEY = os.environ.get("ACCOUNT_KEY")
+AUTH_URL = os.environ["ACCOUNT_HOST"]
+AUTH_KEY = os.environ["ACCOUNT_KEY"]
 client = CosmosClient(url=AUTH_URL, key=AUTH_KEY)
 
 def do_basic_stuff():
@@ -27,6 +27,23 @@ import time
 
 
 database.set_container_properties(container, default_ttl=time.time() + 60 * 60)
+
+try:
+    database.delete_container('containerwithspecificsettings')
+except HTTPFailure:
+    pass
+
+container = database.create_container(
+    id='containerwithspecificsettings',
+    partition_key={
+        "paths": [  
+        "/AccountNumber"  
+        ],  
+        "kind": "Hash"  
+    }
+)
+
+print(container)
 
 def upload():
     import glob
@@ -71,3 +88,5 @@ do_basic_stuff()
 upload()
 clear_stuff()
 find_stuff(query)
+
+

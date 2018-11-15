@@ -1,12 +1,13 @@
+"""
+Access (query/create/delete/manage) items, databases and collections in Azure Cosmos SQL Databases
+"""
+
 __all__ = ["CosmosClient", "Database", "Container", "Item"]
 
 
 from internal.cosmos.errors import HTTPFailure
 
-"""
-Cosmos client Pythonidae
-"""
-from typing import Any, Iterable, Optional, Dict, Union, Tuple, cast, overload
+from typing import Any, List, Iterable, Optional, Dict, Union, Tuple, cast, overload
 
 
 from internal.cosmos.cosmos_client import CosmosClient as _CosmosClient
@@ -23,7 +24,8 @@ class User:
 
 class CosmosClient:
     """
-    CosmosDB SQL Client. This is the main entry point to the Cosmos DB object model.
+    Provides a client-side logical representation of the Azure Cosmos DB database account.
+    This client is used to configure and execute requests in the Azure Cosmos DB database service.
     """
 
     def __init__(self, url: "str", key, consistency_level="Session"):
@@ -46,12 +48,12 @@ class CosmosClient:
     def _get_database_link(database_or_id: "Union[str, Database]") -> "str":
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
-    def create_database(self, id: "str", fail_if_exists=False) -> "Database":
+    def create_database(self, id: "str", fail_if_exists: "bool"=False) -> "Database":
         """ Create a new database with the given name (id)
 
         :param id: Id (name) of the database to create.
-        :param bool fail_if_exists: Fail if database already exists.
-        :raises azure.cosmos.errors.HTTPFailure: If `fail_if_exists` is set to True and a database with the given id already exists
+        :param fail_if_exists: Fail if database already exists.
+        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given id already exists
 
         :Example: Creating a new database
 
@@ -73,12 +75,12 @@ class CosmosClient:
                 raise
         return self.get_database(id)
 
-    def get_database(self, database: "Union[str, Database]") -> "DatabaseReference":
+    def get_database(self, database: "Union[str, Database]") -> "Database":
         """
         Retreive the existing database with the id (name) `id`. 
 
-        :param id: Id of the new database.
-        :raise HTTPError: If the given database couldn't be retrieved.
+        :param id: Id of the new :class:`Database`.
+        :raise `HTTPFailure`: If the given database couldn't be retrieved.
         """
         database_link = CosmosClient._get_database_link(database)
         properties = self.client_context.ReadDatabase(database_link)
@@ -89,7 +91,7 @@ class CosmosClient:
         Get the database properties 
 
         :param database: Id (or name) of the database to retrieve properties for.
-        :raise HTTPError: If the database cannot be retreived from the server.
+        :raise `HTTPFailure`: If the database cannot be retreived from the server.
         """
         database_link = CosmosClient._get_database_link(database)
         properties = self.client_context.ReadDatabase(database_link)
@@ -97,7 +99,7 @@ class CosmosClient:
 
     def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
         """
-        Return all databases matching the query, or all databases if query is not provided
+        List databases in the Cosmos SQL Database Account. 
 
         :param query: Cosmos DB SQL query. If omitted, all databases will be listed.
         """
@@ -114,10 +116,10 @@ class CosmosClient:
 
     def delete_database(self, database: "Union[Database, str]"):
         """
-        Delete the database with the given id.
+        Delete the database with the given id (name).
 
-        :param database: The id (name) of or database instance to delete. 
-        :raise azure.cosmos.HTTPError: If the call to delete the database fails.
+        :param database: The id (name) of, or the database instance to delete. 
+        :raise HTTPFailure: If the call to delete the database fails.
         """
         database_link = CosmosClient._get_database_link(database)
         self.client_context.DeleteDatabase(database_link)
@@ -125,7 +127,7 @@ class CosmosClient:
 
 class Database:
     """
-    Represents an Azure Cosmos Database.
+    Represents an Azure Cosmos SQL :class:`Database`.
 
     A database contains one or more collections, each of which can contain stored procedures, 
     triggers, user defined functions.
@@ -150,20 +152,47 @@ class Database:
             f"{self.database_link}/colls/{container_or_id}",
         )
 
-    def create_container(self, id, options=None, **kwargs) -> "ContainerReference":
+    def create_container(self, id, options=None, *, partition_key:"str"=None, indexing_policy:"Optional[Dict[str, Any]]"=None, default_ttl:"int"=None) -> "Container":
         """
         Create a new container with the given id (name). 
         
-        If a container with the given id (name) already exists, an HTTPError will be raised.
+        If a container with the given id (name) already exists, an HTTPFailure with status_code 409 will be raised.
 
-        :param str id: Id of container to create
-        :raise HTTPError:
+        :param id: Id of container to create
+        :param partition_key: The partition key to use for the container 
+        :param indexing_policy: The indexing policy to apply to the container
+        :param default_ttl: Default TTL (time to live) for the container 
+        :raise HTTPFailure: The container creation failed
 
-        Keyword arguments:
-        partitionKey, indexingPolicy, defaultTtl, conflictResolutionPolicy
+        **Example:** Create a container with the name 'mycontainer' with default settings:
+
+        .. code-block:: python
+
+            container = database.create_container('mycontainer')
+
+        **Example:** Create a container with the name 'containerwithspecificsettings' with  custom particion key
+
+        .. code-block:: python
+
+            container = database.create_container(
+                id='containerwithspecificsettings',
+                partition_key={
+                    "paths": [  
+                    "/AccountNumber"  
+                    ],  
+                    "kind": "Hash"  
+                }
+            )
+        
         """
         definition = dict(id=id)
-        definition.update(kwargs)
+        if partition_key: 
+            definition['partitionKey'] = partition_key
+        if indexing_policy:
+            definition['indexingPolicy'] = indexing_policy
+        if default_ttl:
+            definition['defaultTtl'] = default_ttl
+
         data = self.client_context.CreateContainer(
             database_link=self.database_link, collection=definition, options=options
         )
@@ -182,12 +211,12 @@ class Database:
     def delete_container(self, container: "Union[str, Container]"):
         """ Delete the container
 
-        :param container: The container to delete. 
+        :param container: The container to delete. You can either pass in the name (id) of the container to delete or a container instance.  
         """
         collection_link = self._get_container_link(container)
         properties = self.client_context.DeleteContainer(collection_link)
 
-    def get_container(self, container: "Union[str, Container]") -> "ContainerReference":
+    def get_container(self, container: "Union[str, Container]") -> "Container":
         """ Get the container with the id (name) `container`. 
 
         :param container: The id (name) of the continer, or a container instance.
@@ -262,11 +291,9 @@ class Database:
 
     def get_container_properties(self, container) -> "Dict[str, Any]":
         """
-        Get properties for of container. TODO: implement properly
+        Get properties for the given container.
         """
-        collection_link = getattr(
-            container, "collection_link", f"{self.database_link}/cols/{container}"
-        )
+        collection_link = self._get_container_link(container)
         properties = self.client_context.ReadContainer(collection_link)
         return properties
 
@@ -309,6 +336,8 @@ class Item(dict):
 
 
 class Container:
+    """ An Azure Cosmos SQL Container
+    """
     def __init__(
         self,
         client_context: "ClientContext",
@@ -331,8 +360,6 @@ class Container:
         """
         Get the item identified by `id`
         :param str id: Id of item to retreive
-        :param callable metadata_handler: Optional method that will, if provided, receive an instance
-        of `CosmosCallMetadata` representing metadata about the operation (RSU cost etc.)
         :returns: Item if present.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
@@ -342,6 +369,8 @@ class Container:
         return Item(headers=headers, data=result)
 
     def list_items(self, options=None) -> "Iterable[Item]":
+        """ List all items in the collection
+        """
         options = options or {}
         items = self.client_context.ReadItems(
             collection_link=self.collection_link, feed_options=options
@@ -359,15 +388,34 @@ class Container:
     def query_items(
         self,
         query: "str",
-        parameters=None,
+        parameters:"Optional[List]"=None,
         options=None,
         partition_key: "Optional[str]" = None,
     ) -> "Iterable[Item]":
         """Return any items matching the given `query`.
 
-        .. code::
+        :param query: The Azure Cosmos SQL query to run
+        :param parameters: Optional array of parameters
 
-            print('hello')
+        **Example:** find all families in the state of NY:
+
+        .. code-block:: python
+
+            items = container.query_items(
+                query='SELECT * FROM Families f WHERE f.address.state = "NY"'
+            )
+
+        **Example:** parameterized query to find all families in the state of NY:
+
+        .. code-block:: python
+
+            items = container.query_items(
+                query='SELECT * FROM Families f WHERE f.address.state = @addressState',
+                parameters=[
+                    dict('name'='@addressState', value='NY')
+                ]
+            )
+
         """
         items = self.client_context.QueryItems(
             database_or_Container_link=self.collection_link,
@@ -397,8 +445,10 @@ class Container:
         """ Create an item in the container.
 
         :param body: A dict-like object or string representing the item to create.
-        :raises HTTPError: 
-        In order to replace an existing item, use the `Collection.upsert_item` method.
+        :raises `HTTPFailure`: 
+
+        In order to replace an existing item, use the :func:`Collection.upsert_item` method.
+
         """
         result = self.client_context.CreateItem(
             database_or_Container_link=self.collection_link, document=body
