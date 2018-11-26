@@ -108,7 +108,7 @@ except HTTPFailure as e:
     database.get_container(test_container_name)
 ```
 
-The preceding snippet also handles the `HTTPFailure` exception if the container creation failed. For more information on error handling and troubleshooting, see the [Troublshooting](#troubleshooting) section.
+The preceding snippet also handles the `HTTPFailure` exception if the container creation failed. For more information on error handling and troubleshooting, see the [Troubleshooting](#troubleshooting) section.
 
 ### Get an existing container
 
