@@ -200,11 +200,11 @@ For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_
 
 ## Troubleshooting
 
-When you issue requests to the Azure Cosmos DB Python SDK, errors that are returned by the service correspond to the HTTP status codes returned for REST API requests:
+When you interact with Cosmos DB using the Python SDK, errors returned by the service correspond to the same HTTP status codes returned for REST API requests.
 
 [HTTP Status Codes for Azure Cosmos DB][cosmos_http_status_codes]
 
-For example, when you try to create a container using a name that's already in use in your Cosmos DB database, a `409` error is returned, indicating the conflict. In the following snippet, the conflict is handled gracefully by catching the exception and displaying additional information about the error.
+For example, if you try to create a container using a name that's already in use in your Cosmos DB database, a `409` error is returned, indicating the conflict. In the following snippet, the error is handled gracefully by catching the exception and displaying additional information about the error.
 
 ```Python
 try:
@@ -219,7 +219,7 @@ The container name must be unique within the database.""")
     database.get_container(test_container_name)
 ```
 
-**TODO: Additional info on handling common or otherwise pertinent Cosmos DB errors. For example, handling `429 Too Many Requests` with [exponential backoff retries][azure_retry]. Or, simply call it out and link to it?**
+**TODO: Add more info on handling common or otherwise pertinent Cosmos DB errors. For example, handling `429 Too Many Requests` with [exponential backoff retries][azure_retry]. Or, simply call it out and link to it?**
 
 ## Next steps
 
