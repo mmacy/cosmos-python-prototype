@@ -40,13 +40,18 @@ Interaction with Cosmos DB starts with an instance of the **CosmosClient** class
 You can get your account URI and account key in several ways, including with the [Azure CLI][azure_cli] and [Azure portal][azure_portal]. The Bash snippet below retrieves the account URI and its primary master key with the Azure CLI, and exports those values as environment variables.
 
 ```Bash
+RES_GROUP=<resource-group-name>
+ACCT_NAME=<cosmos-db-account-name>
+
 export ACCOUNT_HOST=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_NAME --query documentEndpoint --output tsv)
 export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $ACCT_NAME --query primaryMasterKey --output tsv)
 ```
 
-With the `ACCOUNT_HOST` and `ACCOUNT_KEY` environment variables populated, you can create the **CosmosClient**:
+Once you've populated the `ACCOUNT_HOST` and `ACCOUNT_HOST` environment variables, you can create the **CosmosClient**.
 
 ```Python
+from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
+
 import os
 url = os.environ['ACCOUNT_HOST']
 key = os.environ['ACCOUNT_KEY']
