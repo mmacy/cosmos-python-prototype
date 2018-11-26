@@ -80,7 +80,7 @@ For more information on these resources, see [Working with Azure Cosmos database
 
 ## Examples
 
-The following sections provide several example code snippets covering some of the most common Comsos DB tasks, including:
+The following sections provide several example code snippets covering some of the most common Cosmos DB tasks, including:
 
 * [Create a database and container](#create-a-database-and-container)
 * [Get an existing container](#get-an-existing-container)
@@ -88,6 +88,8 @@ The following sections provide several example code snippets covering some of th
 * [Insert and update data](#insert-and-update-data)
 * [Get database properties](#get-database-properties)
 * [Modify database properties](#modify-database-properties)
+
+The example snippets are taken from [examples.py](examples/examples.py).
 
 ### Create a database and container
 
@@ -198,11 +200,26 @@ For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_
 
 ## Troubleshooting
 
-**TODO: Information on errors, exception handling, and anything that SDK users might commonly encounter as they learn and use the SDK.**
+When you issue requests to the Azure Cosmos DB Python SDK, errors that are returned by the service correspond to the HTTP status codes returned for REST API requests:
+
+[HTTP Status Codes for Azure Cosmos DB][cosmos_http_status_codes]
+
+For example, when you try to create a container using a name that's already in use in your Cosmos DB database, a `409` error is returned, indicating the conflict. In the following snippet, the conflict is handled gracefully by catching the exception and displaying additional information about the error.
 
 ```Python
-# Snippets for unpacking/handling common errors/exceptions
+try:
+    database.create_container(id=test_container_name)
+except HTTPFailure as e:
+    if e.status_code == 409:
+        print("""Error creating container.
+HTTP status code 409: The name provided for the container is already in use.
+The container name must be unique within the database.""")
+    else:
+        raise
+    database.get_container(test_container_name)
 ```
+
+**TODO: Additional info on handling common or otherwise pertinent Cosmos DB errors. For example, handling `429 Too Many Requests` with [exponential backoff retries][azure_retry]. Or, simply call it out and link to it?**
 
 ## Next steps
 
@@ -211,11 +228,13 @@ For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_
 <!-- LINKS -->
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_portal]: https://portal.azure.com
+[azure_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_sub]: https://azure.microsoft.com/free/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cosmos_account]: https://docs.microsoft.com/azure/cosmos-db/account-overview
 [cosmos_container]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
 [cosmos_database]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-databases
+[cosmos_http_status_codes]: https://docs.microsoft.com/rest/api/cosmos-db/http-status-codes-for-cosmosdb
 [cosmos_item]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-items
 [cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
 [cosmos_ttl]: https://docs.microsoft.com/azure/cosmos-db/time-to-live
