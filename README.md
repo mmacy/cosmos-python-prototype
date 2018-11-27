@@ -60,7 +60,7 @@ client = CosmosClient(url, key)
 
 ## Usage
 
-Once you have an initialized **CosmosClient**, you can interact with the primary resource types in Cosmos DB.
+Once you have an initialized **CosmosClient**, you can interact with the primary resource types in Cosmos DB:
 
 * [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
 * [Container][cosmos_container]: Each database houses one or more containers. The container type is determined by the selected database API.
@@ -77,7 +77,7 @@ The following sections provide several example code snippets covering some of th
 * [Query the database](#query-the-database)
 * [Insert and update data](#insert-and-update-data)
 * [Get database properties](#get-database-properties)
-* [Modify database properties](#modify-database-properties)
+* [Modify container properties](#modify-container-properties)
 
 The example snippets are taken from [examples.py](examples/examples.py).
 
@@ -178,7 +178,7 @@ print(json.dumps(properties))
 
 ### Modify container properties
 
-Certain properties of an existing container can be modified. This example sets the default time to live (TTL) for items in the container to 10 seconds.
+Certain properties of an existing container can be modified. This example sets the default time to live (TTL) for items in the container to 10 seconds:
 
 ```Python
 database = client.get_database(test_database_name)
@@ -192,11 +192,11 @@ For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_
 
 ### General
 
-When you interact with Cosmos DB using the Python SDK, errors returned by the service correspond to the same HTTP status codes returned for REST API requests.
+When you interact with Cosmos DB using the Python SDK, errors returned by the service correspond to the same HTTP status codes returned for REST API requests:
 
 [HTTP Status Codes for Azure Cosmos DB][cosmos_http_status_codes]
 
-For example, if you try to create a container using a name that's already in use in your Cosmos DB database, a `409` error is returned, indicating the conflict. In the following snippet, the error is handled gracefully by catching the exception and displaying additional information about the error.
+For example, if you try to create a container using an ID (name) that's already in use in your Cosmos DB database, a `409` error is returned, indicating the conflict. In the following snippet, the error is handled gracefully by catching the exception and displaying additional information about the error.
 
 ```Python
 try:
@@ -208,12 +208,11 @@ HTTP status code 409: The ID (name) provided for the container is already in use
 The container name must be unique within the database.""")
     else:
         raise
-    database.get_container(test_container_name)
 ```
 
 ### Handle transient errors with retries
 
-While working with Cosmos DB, you might encounter transient failures caused by rate limits enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
+While working with Cosmos DB, you might encounter transient failures caused by [rate limits][cosmos_request_units] enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
 
 ## Next steps
 
@@ -251,7 +250,8 @@ For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos
 [cosmos_docs]: https://docs.microsoft.com/azure/cosmos-db/
 [cosmos_http_status_codes]: https://docs.microsoft.com/rest/api/cosmos-db/http-status-codes-for-cosmosdb
 [cosmos_item]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-items
-[cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
+[cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items
+[cosmos_request_units]: https://docs.microsoft.com/azure/cosmos-db/request-units
 [cosmos_ttl]: https://docs.microsoft.com/azure/cosmos-db/time-to-live
 [pip]: https://pypi.org/project/pip/
 [python]: https://www.python.org/downloads/
