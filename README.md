@@ -63,18 +63,8 @@ client = CosmosClient(url, key)
 Once you have an initialized **CosmosClient**, you can interact with the primary resource types in Cosmos DB.
 
 * [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
-* [Container][cosmos_container]: Each database contains one or more containers. The container type is determined by the database API (see table below).
-* [Item][cosmos_item]: Containers hold one or more items. Items represent different entities depending on the database API (see table below).
-
-**TODO: Link the container and item types to Python classes in API reference. Or remove it if this is too much info.**
-
-| Database API | Container type | Item type |
-| ------------ | -------------- | --------- |
-| SQL          | Container      | Item |
-| Cassandra    | Table          | Row |
-| MongoDB      | Collection     | Document |
-| Gremlin      | Graph          | Node or Edge |
-| Azure Table  | Table          | Item |
+* [Container][cosmos_container]: Each database houses one or more containers. The container type is determined by the selected database API.
+* [Item][cosmos_item]: Containers hold one or more items. Items represent different entity types depending on the database API.
 
 For more information on these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
@@ -200,6 +190,8 @@ For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_
 
 ## Troubleshooting
 
+### General
+
 When you interact with Cosmos DB using the Python SDK, errors returned by the service correspond to the same HTTP status codes returned for REST API requests.
 
 [HTTP Status Codes for Azure Cosmos DB][cosmos_http_status_codes]
@@ -212,28 +204,51 @@ try:
 except HTTPFailure as e:
     if e.status_code == 409:
         print("""Error creating container.
-HTTP status code 409: The name provided for the container is already in use.
+HTTP status code 409: The ID (name) provided for the container is already in use.
 The container name must be unique within the database.""")
     else:
         raise
     database.get_container(test_container_name)
 ```
 
-**TODO: Add more info on handling common or otherwise pertinent Cosmos DB errors. For example, handling `429 Too Many Requests` with [exponential backoff retries][azure_retry]. Or, simply call it out and link to it?**
+### Handle transient errors with retries
+
+While working with Cosmos DB, you might encounter transient failures caused by rate limits enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
 
 ## Next steps
 
-**TODO: Links to other content or SDKs that might be useful, including closely related SDKs for which they might have initially been searching for.**
+### More sample code
+
+Several Cosmos DB Python SDK samples are available to you in the SDK's GitHub repository. These samples provide example code for additional scenarios commonly encountered while working with Cosmos DB:
+
+* [`examples.py`][sample_examples_misc] - Contains the code snippets found in this article, including basic account, database, and document management samples.
+* [`databasemanagementsample.py`][sample_database_mgmt] - Python code for working with Azure Cosmos DB databases, including:
+  * Create database
+  * Get database by ID
+  * Get database by query
+  * List databases in account
+  * Delete database
+* [`documentmanagementsample.py`][sample_document_mgmt] - Example code for working with Cosmos DB documents, including:
+  * Create container
+  * Create documents (including those with differing schemas)
+  * Get document by ID
+  * Get all documents in a container
+
+### Additional documentation
+
+For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos DB documentation][cosmos_docs] on docs.microsoft.com.
 
 <!-- LINKS -->
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_portal]: https://portal.azure.com
-[azure_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
+[azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
+[azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_sub]: https://azure.microsoft.com/free/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cosmos_account]: https://docs.microsoft.com/azure/cosmos-db/account-overview
 [cosmos_container]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
 [cosmos_database]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-databases
+[cosmos_docs]: https://docs.microsoft.com/azure/cosmos-db/
 [cosmos_http_status_codes]: https://docs.microsoft.com/rest/api/cosmos-db/http-status-codes-for-cosmosdb
 [cosmos_item]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-items
 [cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
@@ -242,3 +257,6 @@ The container name must be unique within the database.""")
 [python]: https://www.python.org/downloads/
 [venv]: https://docs.python.org/3/library/venv.html
 [virtualenv]: https://virtualenv.pypa.io
+[sample_examples_misc]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/examples.py
+[sample_database_mgmt]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/databasemanagementsample.py
+[sample_document_mgmt]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/documentmanagementsample.py
