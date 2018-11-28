@@ -47,7 +47,7 @@ export ACCOUNT_HOST=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_
 export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $ACCT_NAME --query primaryMasterKey --output tsv)
 ```
 
-Once you've populated the `ACCOUNT_HOST` and `ACCOUNT_HOST` environment variables, you can create the **CosmosClient**.
+Once you've populated the `ACCOUNT_HOST` and `ACCOUNT_KEY` environment variables, you can create the **CosmosClient**.
 
 ```Python
 from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
@@ -89,13 +89,13 @@ After authenticating your **CosmosClient**, you can work with any resource in th
 test_database_name = 'testDatabase'
 test_container_name = 'testContainer'
 
-database = client.create_database(id=test_database_name, fail_if_exists=False)
+db = client.create_database(id=test_database_name, fail_if_exists=False)
 try:
-    database.create_container(id=test_container_name)
+    db.create_container(id=test_container_name)
 except HTTPFailure as e:
     if e.status_code != 409:
         raise
-    database.get_container(test_container_name)
+    db.get_container(test_container_name)
 ```
 
 The preceding snippet also handles the `HTTPFailure` exception if the container creation failed. For more information on error handling and troubleshooting, see the [Troubleshooting](#troubleshooting) section.
@@ -105,11 +105,10 @@ The preceding snippet also handles the `HTTPFailure` exception if the container 
 Get an existing container using a known database and container name, then insert an item:
 
 ```Python
-client = CosmosClient(url, key)
 container = Container(client.client_context, database=test_database_name, id=test_container_name)
 container.upsert_item({
     'id': 'something',
-    'value': 'else'
+    'value': 'new'
 })
 ```
 
@@ -119,8 +118,8 @@ You can also get a container from the database object:
 database = client.get_database(test_database_name)
 container = database.get_container(test_container_name)
 container.upsert_item({
-    'id': 'something',
-    'value': 'new'
+    'id': 'another',
+    'value': 'something'
 })
 ```
 
@@ -143,7 +142,7 @@ for item in items:
 
 ### Insert and update data
 
-Insert items into the container:
+To insert items into the container, pass a dictionary containing your data to `Container.upsert_item`:
 
 ```Python
 database = client.get_database(test_database_name)
