@@ -68,7 +68,7 @@ class CosmosClient:
 
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
         """ Create a new database with the given name (id)
-        
+
         :param id: Id (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given id already exists
@@ -172,9 +172,7 @@ class Database:
         self.properties = properties
         self.database_link = CosmosClient._get_database_link(id)
 
-    def _get_container_link(
-        self, container_or_id: "Union[str, Container]"
-    ) -> "str":
+    def _get_container_link(self, container_or_id: "Union[str, Container]") -> "str":
         return getattr(
             container_or_id,
             "collection_link",
@@ -249,12 +247,12 @@ class Database:
         :param container: The container to delete. You can either pass in the name (id) of the container to delete or a container instance.  
         """
         collection_link = self._get_container_link(container)
-        properties = self.client_context.DeleteContainer(collection_link)
+        self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
         """ Get the container with the id (name) `container`. 
 
-        :param container: The id (name) of the continer, or a container instance.
+        :param container: The id (name) of the container, or a container instance.
         :raise `HTTPFailure`: Raised if the client was unable to get the container. This includes if the container does not exist.
 
         .. code-block:: python
@@ -382,7 +380,7 @@ class Container:
         client_context: "ClientContext",
         database: "Union[Database, str]",
         id: "str",
-        properties: "Optional[Dict[str, Any]]"=None
+        properties: "Optional[Dict[str, Any]]" = None,
     ):
         self.client_context = client_context
         self.session_token = None
