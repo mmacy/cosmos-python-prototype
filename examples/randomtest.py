@@ -7,6 +7,7 @@ AUTH_URL = os.environ["ACCOUNT_HOST"]
 AUTH_KEY = os.environ["ACCOUNT_KEY"]
 client = CosmosClient(url=AUTH_URL, key=AUTH_KEY)
 
+
 def do_basic_stuff():
     for database in client.list_databases():
         print(database)
@@ -15,12 +16,24 @@ def do_basic_stuff():
             for item in container.list_items():
                 print(item)
 
+
 database = client.create_database("swaggers", fail_if_exists=False)
+
+
+try:
+    container = database.create_container(
+        id="containerwithspecificsettings",
+        partition_key={"paths": ["/AccountNumber"], "kind": "Hash"},
+    )
+except HTTPFailure as e:
+    if e.status_code != 409:
+        raise
+
 try:
     container = database.get_container(
         "publicmaster"
     )  # TODO: Why not have a fail_if_exists on every create?
-except ValueError:  # TODO: What is the appropriate exception here?
+except HTTPFailure:  # TODO: What is the appropriate exception here?
     container = database.create_container("publicmaster")
 
 import time
@@ -29,21 +42,21 @@ import time
 database.set_container_properties(container, default_ttl=time.time() + 60 * 60)
 
 try:
-    database.delete_container('containerwithspecificsettings')
+    container = database.get_container("customers")
+except HTTPFailure as failure:
+    if failure.status_code == 404:
+        print("Container did not exist...")
+    else:
+        print(f"Failed to retrieve container - status code:{failure.status_code}")
+
+try:
+    database.delete_container("containerwithspecificsettings")
 except HTTPFailure:
     pass
 
-container = database.create_container(
-    id='containerwithspecificsettings',
-    partition_key={
-        "paths": [  
-        "/AccountNumber"  
-        ],  
-        "kind": "Hash"  
-    }
-)
 
 print(container)
+
 
 def upload():
     import glob
@@ -63,12 +76,14 @@ def upload():
                 except (json.decoder.JSONDecodeError, UnicodeDecodeError):
                     pass
 
-def find_stuff(query):
-    items = container.query_items(query)
+
+def find_stuff(query, parameters):
+    items = container.query_items(query, parameters)
 
     for item in items:
         item = container.get_item(item["id"])
         print(str(item)[0:50])
+
 
 def clear_stuff():
     for item in container.list_items():
@@ -79,14 +94,14 @@ def clear_stuff():
         else:
             print(f"leaving {id}")
 
+
 query = """
     SELECT * FROM root s
-    WHERE s.info.version = '2018-01-01'
+    WHERE s.info.version = @version
     """
 
 do_basic_stuff()
 upload()
 clear_stuff()
-find_stuff(query)
-
+find_stuff(query, parameters=[dict(name="@version", value="2018-01-01")])
 

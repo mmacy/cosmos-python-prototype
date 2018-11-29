@@ -39,6 +39,7 @@ class ClientContext(_CosmosClient):
 class User:
     pass
 
+
 class CosmosClient:
     """
     Provides a client-side logical representation of the Azure Cosmos DB database account.
@@ -137,7 +138,7 @@ class CosmosClient:
 
 class DatabaseClient:
     """
-    Represents an Azure Cosmos SQL :class:`Database`.
+    Client allowing access to Azure Cosmos SQL :class:`Database` instances.
 
     A database contains one or more collections, each of which can contain stored procedures, 
     triggers, user defined functions.
@@ -343,6 +344,23 @@ class DatabaseClient:
 
 
 class Database(DatabaseClient):
+    """
+    :ivar properties: A dictionary of system generated properties for this database. See below for the list of keys.
+
+    An Azure Cosmos SQL Database has the following system generated (read-only) properties:
+
+    _rid:   The resource ID.
+
+    _ts:    Specifies the last updated timestamp of the resource. The value is a timestamp.
+
+    _self:	The unique addressable URI for the resource.
+
+    _etag:	The resource etag required for optimistic concurrency control.
+
+    _colls:	The addressable path of the collections resource.
+
+    _users:	The addressable path of the users resource.
+    """ 
     def __init__(
         self, client_context: "ClientContext", id: "str", properties: "Dict[str, Any]"
     ):
@@ -358,7 +376,11 @@ class Item(dict):
 
 
 class ContainerClient:
-    """ An Azure Cosmos SQL Container
+    """ A client allowing access to Azure Cosmos SQL Containers.
+
+    :ivar id: Id (name) of the container
+    :session_token: The session token for the container.
+
     """
 
     def __init__(
@@ -536,8 +558,8 @@ class ContainerClient:
 class Container(ContainerClient):
     """ A container reference is a reference to an existing container.
 
-    Instances of this class are not created directly; they are retrieved from the
-    containing database's get/query/create_container methods.
+    Instances of this class are typically not created directly; they are retrieved from the
+    containing `DatabaseClient`'s get/query/create_container methods.
     """
 
     def __init__(

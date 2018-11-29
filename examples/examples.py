@@ -1,4 +1,4 @@
-from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
+from azure.cosmos import HTTPFailure, CosmosClient, ContainerClient
 
 # It all starts with a client instance:
 import os
@@ -20,7 +20,7 @@ except HTTPFailure as e:
 ####
 
 # In order to retreive a container where you know the database name and container name:
-container = Container(client.client_context, database=test_database_name, id=test_container_name)
+container = ContainerClient(client.client_context, database=test_database_name, id=test_container_name)
 container.upsert_item({
     'id': 'something',
     'value': 'else'
