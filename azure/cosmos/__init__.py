@@ -38,8 +38,8 @@ class CosmosClient:
         .. code-block:: python
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-            client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+            ACCOUNT_URI = os.environ['ACCOUNT_URI']
+            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
 
         """
         self.client_context = ClientContext(
@@ -63,8 +63,8 @@ class CosmosClient:
 
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-            client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+            ACCOUNT_URI = os.environ['ACCOUNT_URI']
+            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
             database = client.create_database('nameofdatabase')
 
         """
@@ -91,7 +91,7 @@ class CosmosClient:
 
     def get_database_properties(self, database: "Union[Database, str]"):
         """
-        Get the database properties
+        Get the database properties.
 
         :param database: ID (name) of the database whose properties should be retrieved.
         :raise `HTTPFailure`: If the given database couldn't be retrieved.
@@ -130,7 +130,7 @@ class CosmosClient:
 
 class Database:
     """
-    Represents an Azure Cosmos SQL :class:`Database`.
+    Represents an Azure Cosmos DB SQL database.
 
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
@@ -363,7 +363,7 @@ class Item(dict):
 
 
 class Container:
-    """ An Azure Cosmos SQL container.
+    """ An Azure Cosmos DB SQL API container.
     """
 
     def __init__(
@@ -422,7 +422,7 @@ class Container:
     ) -> "Iterable[Item]":
         """Return all items matching the given `query`.
 
-        :param query: The Azure Cosmos SQL query to execute.
+        :param query: The Azure Cosmos DB SQL query to execute.
         :param parameters: Optional array of parameters.
 
         **Example:** Find all families in the state of NY.
