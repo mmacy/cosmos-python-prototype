@@ -1,5 +1,5 @@
 """
-Access (query/create/delete/manage) items, databases and collections in Azure Cosmos SQL Databases
+Create, read, update, and delete databases, containers, and items in Azure Cosmos DB SQL API databases.
 """
 
 __all__ = ["CosmosClient", "Database", "Container", "Item"]
@@ -24,20 +24,22 @@ class User:
 
 class CosmosClient:
     """
-    Provides a client-side logical representation of the Azure Cosmos DB database account.
-    This client is used to configure and execute requests in the Azure Cosmos DB database service.
+    Provides a client-side logical representation of an Azure Cosmos DB account.
+    Use this client to configure and execute requests to the Azure Cosmos DB service.
     """
 
     def __init__(self, url: "str", key, consistency_level="Session"):
         """ Instantiate a new CosmosClient.
 
-        :param url: The URL of the cosmos account. 
+        :param url: The URL of the Cosmos DB account.
 
-        >>> import os
-        >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-        >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-        >>> client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
-        ...
+        **Example**: Create a new client instance.
+
+        .. code-block:: python
+            import os
+            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
+            ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
+            client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
 
         """
         self.client_context = ClientContext(
@@ -49,20 +51,21 @@ class CosmosClient:
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
-        """ Create a new database with the given name (id)
+        """ Create a new database with the given ID (name).
 
-        :param id: Id (name) of the database to create.
+        :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
-        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given id already exists
+        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        :Example: Creating a new database
+        **Example**: Create a new database.
 
-        >>> import os
-        >>> ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-        >>> ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
-        >>> client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
-        >>> database = client.create_database('nameofdatabase')        
-        ...
+        .. code-block:: python
+
+            import os
+            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
+            ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
+            client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
+            database = client.create_database('nameofdatabase')
 
         """
         try:
@@ -77,9 +80,9 @@ class CosmosClient:
 
     def get_database(self, database: "Union[str, Database]") -> "Database":
         """
-        Retreive the existing database with the id (name) `id`. 
+        Retrieve an existing database with the ID (name) `id`.
 
-        :param id: Id of the new :class:`Database`.
+        :param id: ID of the new :class:`Database`.
         :raise `HTTPFailure`: If the given database couldn't be retrieved.
         """
         database_link = CosmosClient._get_database_link(database)
@@ -88,10 +91,10 @@ class CosmosClient:
 
     def get_database_properties(self, database: "Union[Database, str]"):
         """
-        Get the database properties 
+        Get the database properties
 
-        :param database: Id (or name) of the database to retrieve properties for.
-        :raise `HTTPFailure`: If the database cannot be retreived from the server.
+        :param database: ID (name) of the database whose properties should be retrieved.
+        :raise `HTTPFailure`: If the given database couldn't be retrieved.
         """
         database_link = CosmosClient._get_database_link(database)
         properties = self.client_context.ReadDatabase(database_link)
@@ -99,9 +102,9 @@ class CosmosClient:
 
     def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
         """
-        List databases in the Cosmos SQL Database Account. 
+        List the databases in a Cosmos DB SQL database account.
 
-        :param query: Cosmos DB SQL query. If omitted, all databases will be listed.
+        :param query: Cosmos DB SQL query. If omitted, all databases in the account are listed.
         """
         if query:
             yield from [
@@ -116,10 +119,10 @@ class CosmosClient:
 
     def delete_database(self, database: "Union[Database, str]"):
         """
-        Delete the database with the given id (name).
+        Delete the database with the given ID (name).
 
-        :param database: The id (name) of, or the database instance to delete. 
-        :raise HTTPFailure: If the call to delete the database fails.
+        :param database: The ID (name) or :class:`Database` instance of the database to delete.
+        :raise HTTPFailure: If the database couldn't be deleted.
         """
         database_link = CosmosClient._get_database_link(database)
         self.client_context.DeleteDatabase(database_link)
@@ -129,17 +132,17 @@ class Database:
     """
     Represents an Azure Cosmos SQL :class:`Database`.
 
-    A database contains one or more collections, each of which can contain stored procedures, 
-    triggers, user defined functions.
+    A database contains one or more containers, each of which can contain items,
+    stored procedures, triggers, and user-defined functions.
 
-    A database also has associated users, each with a set of permissions to access various 
-    other collections, stored procedures, triggers, user defined functions, or items
+    A database also has associated users, each with a set of permissions for accessing other
+    containers, stored procedures, triggers, user-defined functions, or items.
     """
 
     def __init__(self, client_context: "ClientContext", id: "str"):
         """
-        :param ClientSession client_context: Client from which this database was retreived.
-        :param str id: Id of the database
+        :param ClientSession client_context: Client from which this database was retrieved.
+        :param str id: ID (name) of the database.
         """
         self.client_context = client_context
         self.id = id
@@ -162,36 +165,35 @@ class Database:
         default_ttl: "int" = None,
     ) -> "Container":
         """
-        Create a new container with the given id (name). 
-        
-        If a container with the given id (name) already exists, an HTTPFailure with status_code 409 will be raised.
+        Create a new container with the given ID (name).
 
-        :param id: Id of container to create
-        :param partition_key: The partition key to use for the container 
-        :param indexing_policy: The indexing policy to apply to the container
-        :param default_ttl: Default TTL (time to live) for the container 
-        :raise HTTPFailure: The container creation failed
+        If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
-        **Example:** Create a container with the name 'mycontainer' with default settings:
+        :param id: ID of container to create.
+        :param partition_key: The partition key to use for the container.
+        :param indexing_policy: The indexing policy to apply to the container.
+        :param default_ttl: Default TTL (time to live) for the container.
+        :raise HTTPFailure: The container creation failed.
+        **Example:** Create a container name 'mycontainer' with default settings:
 
         .. code-block:: python
 
             container = database.create_container('mycontainer')
 
-        **Example:** Create a container with the name 'containerwithspecificsettings' with  custom particion key
+        **Example:** Create a container named 'containerwithspecificsettings' with a custom partition key.
 
         .. code-block:: python
 
             container = database.create_container(
                 id='containerwithspecificsettings',
                 partition_key={
-                    "paths": [  
-                    "/AccountNumber"  
-                    ],  
-                    "kind": "Hash"  
+                    "paths": [
+                    "/AccountNumber"
+                    ],
+                    "kind": "Hash"
                 }
             )
-        
+
         """
         definition = dict(id=id)
         if partition_key:
@@ -219,16 +221,16 @@ class Database:
     def delete_container(self, container: "Union[str, Container]"):
         """ Delete the container
 
-        :param container: The container to delete. You can either pass in the name (id) of the container to delete or a container instance.  
+        :param container: The ID (name) of the container to delete. You can either pass in the ID of the container to delete, or :class:`Container` instance.
         """
         collection_link = self._get_container_link(container)
         properties = self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
-        """ Get the container with the id (name) `container`. 
+        """ Get the container with the ID (name) `container`.
 
-        :param container: The id (name) of the continer, or a container instance.
-        :raise `HTTPFailure`: Raised if the client was unable to get the container. This includes if the container does not exist.
+        :param container: The ID (name) of the container, or a :class:`Container` instance.
+        :raise `HTTPFailure`: Raised if the container couldn't be retrieved. This includes if the container does not exist.
 
         .. code-block:: python
 
@@ -253,13 +255,17 @@ class Database:
         )
 
     def list_containers(self, query:"str"=None, parameters=None) -> "Iterable[ContainerReference]":
-        """ List the containers in this database.
+        """ List the containers in the database.
 
-        :param query: If provided, query used to filter which containers to return. If omitted returns all containers.
-        :param parameters: Parameters to query. Only applicable of a query has been specified.
+        :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
+        :param parameters: Parameters for the query. Only applicable if a query has been specified.
+
+        **Example**: List all containers in a database.
+
         .. code-block:: python
 
             database.list_containers()
+
         """
         if query:
             yield from [
@@ -292,7 +298,7 @@ class Database:
         conflict_resolution_policy=None,
     ):
         """
-        Update the properties of the container. Change will be persisted immediately.
+        Update the properties of the container. Property changes are persisted immediately.
         """
         container_id = getattr(container, "id", container)
         parameters = {
@@ -357,7 +363,7 @@ class Item(dict):
 
 
 class Container:
-    """ An Azure Cosmos SQL Container
+    """ An Azure Cosmos SQL container.
     """
 
     def __init__(
@@ -380,9 +386,9 @@ class Container:
 
     def get_item(self, id: "str") -> "Item":
         """
-        Get the item identified by `id`
-        :param str id: Id of item to retreive
-        :returns: Item if present.
+        Get the item identified by `id`.
+        :param str id: ID of item to retrieve.
+        :returns: Item, if present in the container.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
         result = self.client_context.ReadItem(document_link=doc_link)
@@ -391,7 +397,7 @@ class Container:
         return Item(headers=headers, data=result)
 
     def list_items(self, options=None) -> "Iterable[Item]":
-        """ List all items in the collection
+        """ List all items in the container.
         """
         options = options or {}
         items = self.client_context.ReadItems(
@@ -414,12 +420,12 @@ class Container:
         options=None,
         partition_key: "Optional[str]" = None,
     ) -> "Iterable[Item]":
-        """Return any items matching the given `query`.
+        """Return all items matching the given `query`.
 
-        :param query: The Azure Cosmos SQL query to run
-        :param parameters: Optional array of parameters
+        :param query: The Azure Cosmos SQL query to execute.
+        :param parameters: Optional array of parameters.
 
-        **Example:** find all families in the state of NY:
+        **Example:** Find all families in the state of NY.
 
         .. code-block:: python
 
@@ -427,7 +433,7 @@ class Container:
                 query='SELECT * FROM Families f WHERE f.address.state = "NY"'
             )
 
-        **Example:** parameterized query to find all families in the state of NY:
+        **Example:** Parameterized query to find all families in the state of NY.
 
         .. code-block:: python
 
@@ -467,9 +473,9 @@ class Container:
         """ Create an item in the container.
 
         :param body: A dict-like object or string representing the item to create.
-        :raises `HTTPFailure`: 
+        :raises `HTTPFailure`:
 
-        In order to replace an existing item, use the :func:`Collection.upsert_item` method.
+        In order to replace an existing item, use the :func:`Container.upsert_item` method.
 
         """
         result = self.client_context.CreateItem(
