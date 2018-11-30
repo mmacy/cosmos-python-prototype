@@ -35,9 +35,8 @@ class User:
 
 class CosmosClient:
     """
-
-    Provides a client-side logical representation of the Azure Cosmos DB database account.
-    This client is used to configure and execute requests in the Azure Cosmos DB database service.
+    Provides a client-side logical representation of an Azure Cosmos DB database account.
+    Use this client to configure and execute requests to the Azure Cosmos DB service.
     """
 
     def __init__(
@@ -69,17 +68,17 @@ class CosmosClient:
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
         """ Create a new database with the given name (id)
 
-        :param id: Id (name) of the database to create.
+        :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given id already exists
 
-        :Example: Creating a new database
+        **Example**: Creating a new database
         .. code-block:: python
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
             ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
             client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
-            database = client.create_database('nameofdatabase')        
+            database = client.create_database('nameofdatabase')   
             
         """
         try:
@@ -101,11 +100,11 @@ class CosmosClient:
         properties = self.client_context.ReadDatabase(database_link)
         return Database(self.client_context, properties["id"], properties)
 
-    def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database ]":
+    def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
         """
         List databases in the Cosmos SQL Database Account. 
 
-        :param query: Cosmos DB SQL query. If omitted, all databases will be listed.
+        :param query: Cosmos DB SQL query. If omitted, all databases in the account will be listed.
         """
         if query:
             yield from [
@@ -120,7 +119,7 @@ class CosmosClient:
 
     def delete_database(self, database: "Union[Database, str]"):
         """
-        Delete the database with the given id (name).
+        Delete the database with the given ID (name).
 
         :param database: The id (name) of, or the database instance to delete. 
         :raise HTTPFailure: If the call to delete the database fails.
@@ -133,11 +132,11 @@ class Database:
     """
     Client allowing access to Azure Cosmos SQL :class:`Database` instances.
 
-    A database contains one or more collections, each of which can contain stored procedures, 
+    A database contains one or more containers, each of which can contain stored procedures, 
     triggers, user defined functions.
 
     A database also has associated users, each with a set of permissions to access various 
-    other collections, stored procedures, triggers, user defined functions, or items
+    other containers, stored procedures, triggers, user defined functions, or items
 
     :ivar id: The id (name) of the database.
     :ivar properties: A dictionary of system generated properties for this database. See below for the list of keys.
@@ -164,8 +163,8 @@ class Database:
         properties: "Optional[Dict[str, Any]]" = None,
     ):
         """
-        :param ClientSession client_context: Client from which this database was retreived.
-        :param str id: Id of the database
+        :param ClientSession client_context: Client from which this database was retrieved.
+        :param str id: ID (name) of the database
         """
         self.client_context = client_context
         self.id = id
@@ -189,11 +188,11 @@ class Database:
         default_ttl: "int" = None,
     ) -> "Container":
         """
-        Create a new container with the given id (name). 
+        Create a new container with the given ID (name). 
         
-        If a container with the given id (name) already exists, an HTTPFailure with status_code 409 will be raised.
+        If a container with the given ID (name) already exists, an HTTPFailure with status_code 409 will be raised.
 
-        :param id: Id of container to create
+        :param id: ID of container to create
         :param partition_key: The partition key to use for the container 
         :param indexing_policy: The indexing policy to apply to the container
         :param default_ttl: Default TTL (time to live) for the container 
@@ -244,15 +243,15 @@ class Database:
     def delete_container(self, container: "Union[str, Container]"):
         """ Delete the container
 
-        :param container: The container to delete. You can either pass in the name (id) of the container to delete or a container instance.  
+        :param container: The container to delete. You can either pass in the name (ID) of the container to delete or a container instance.  
         """
         collection_link = self._get_container_link(container)
         self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
-        """ Get the container with the id (name) `container`. 
+        """ Get the container with the ID (name) `container`. 
 
-        :param container: The id (name) of the container, or a container instance.
+        :param container: The ID (name) of the container, or a container instance.
         :raise `HTTPFailure`: Raised if the client was unable to get the container. This includes if the container does not exist.
 
         .. code-block:: python
@@ -370,7 +369,7 @@ class Item(dict):
 class Container:
     """ An Azure Cosmos SQL container.
 
-    :ivar id: Id (name) of the container
+    :ivar id: ID (name) of the container
     :session_token: The session token for the container.
 
     """
@@ -398,7 +397,7 @@ class Container:
     def get_item(self, id: "str") -> "Item":
         """
         Get the item identified by `id`
-        :param str id: Id of item to retreive
+        :param str id: ID of item to retreive
         :returns: Item if present.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
