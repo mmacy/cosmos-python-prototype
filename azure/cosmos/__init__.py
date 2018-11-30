@@ -132,8 +132,7 @@ class CosmosClient:
 
 
 class Database:
-    """
-    Client allowing access to Azure Cosmos SQL :class:`Database` instances.
+    """ Represents an Azure Cosmos SQL :class:`Database`.
 
     A database contains one or more containers, each of which can contain stored procedures, 
     triggers, user defined functions.
@@ -479,7 +478,7 @@ class Container:
     def upsert_item(self, body: "Dict[str, Any]") -> "Item":
         """ Insert or update the given item. 
 
-        If the item already exists, it will be replaced. If it does not, it will be inserted
+        If the item already exists, it will be replaced. If it does not, it will be inserted.
         """
 
         result = self.client_context.UpsertItem(
