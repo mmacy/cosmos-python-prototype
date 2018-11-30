@@ -191,8 +191,8 @@ class Database:
         default_ttl: "int" = None,
     ) -> "Container":
         """
-        Create a new container with the given ID (name). 
-        
+        Create a new container with the given ID (name).
+
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
         :param id: ID of container to create
@@ -246,7 +246,7 @@ class Database:
     def delete_container(self, container: "Union[str, Container]"):
         """ Delete the container
 
-        :param container: The container to delete. You can either pass in the name (ID) of the container to delete or a container instance.  
+        :param container: The ID (name) of the container to delete. You can either pass in the ID of the container to delete or :class:`Container` instance.
         """
         collection_link = self._get_container_link(container)
         self.client_context.DeleteContainer(collection_link)
@@ -254,7 +254,7 @@ class Database:
     def get_container(self, container: "Union[str, Container]") -> "Container":
         """ Get the container with the ID (name) `container`. 
 
-        :param container: The ID (name) of the container, or a container instance.
+        :param container: The ID (name) of the container, or :class:`Container` instance.
         :raise `HTTPFailure`: Raised if the client was unable to get the container. This includes if the container does not exist.
 
         .. code-block:: python
