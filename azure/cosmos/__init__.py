@@ -50,6 +50,7 @@ class CosmosClient:
         **Example**: Create a new client instance.
 
         .. code-block:: python
+
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
             ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
@@ -77,6 +78,7 @@ class CosmosClient:
         **Example**: Create a new database.
 
         .. code-block:: python
+
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
             ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
