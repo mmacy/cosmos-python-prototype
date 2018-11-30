@@ -44,8 +44,10 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
-        :param url: The URL of the cosmos account. 
+        :param url: The URL of the Cosmos DB account. 
         :param consistency_level: Consistency level to use for the session. 
+
+        **Example**: Create a new client instance.
 
         .. code-block:: python
             import os
@@ -66,20 +68,21 @@ class CosmosClient:
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
-        """ Create a new database with the given ID (name)
+        """ Create a new database with the given ID (name).
 
         :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
-        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists
+        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Creating a new database
+        **Example**: Create a new database
+
         .. code-block:: python
             import os
             ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
             ACCOUNT_HOST = os.environ['ACCOUNT_HOST']
             client = CosmosClient(url=ACCOUNT_HOST, key=ACCOUNT_KEY)
-            database = client.create_database('nameofdatabase')   
-            
+            database = client.create_database('nameofdatabase')
+
         """
         try:
             result = self.client_context.CreateDatabase(database=dict(id=id))
@@ -102,7 +105,7 @@ class CosmosClient:
 
     def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
         """
-        List databases in the Cosmos SQL Database Account. 
+        List databases in a Cosmos DB SQL Account. 
 
         :param query: Cosmos DB SQL query. If omitted, all databases in the account are listed.
         """
@@ -190,7 +193,7 @@ class Database:
         """
         Create a new container with the given ID (name). 
         
-        If a container with the given ID already exists, an HTTPFailure with status_code 409 will be raised.
+        If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
         :param id: ID of container to create
         :param partition_key: The partition key to use for the container 
@@ -211,13 +214,13 @@ class Database:
             container = database.create_container(
                 id='containerwithspecificsettings',
                 partition_key={
-                    "paths": [  
-                    "/AccountNumber"  
-                    ],  
-                    "kind": "Hash"  
+                    "paths": [
+                    "/AccountNumber"
+                    ],
+                    "kind": "Hash"
                 }
             )
-        
+
         """
         definition = dict(id=id)
         if partition_key:
@@ -281,8 +284,8 @@ class Database:
     ) -> "Iterable[Container]":
         """ List the containers in this database.
 
-        :param query: If provided, query used to filter which containers to return. If omitted returns all containers.
-        :param parameters: Parameters to query. Only applicable of a query has been specified.
+        :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
+        :param parameters: Parameters for the query. Only applicable if a query has been specified.
 
         **Example**: List all containers in a database.
 
