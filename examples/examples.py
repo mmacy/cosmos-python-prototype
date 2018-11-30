@@ -71,5 +71,5 @@ print(json.dumps(properties, indent=True))
 database.set_container_properties(container, default_ttl=10)
 
 # Display the new TTL setting for the container
-container_props = database.get_container_properties(container)
+container_props = database.get_container(test_container_name).properties
 print(json.dumps(container_props['defaultTtl']))

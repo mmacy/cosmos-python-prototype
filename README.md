@@ -30,7 +30,7 @@ source azure-cosmosdb-sdk-environment/bin/activate
 Install the Azure Cosmos DB SDK for Python with [pip][pip]:
 
 ```Bash
-pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https://github.com/johanste/azure-cosmos-python-prototype.git@master
+pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https://github.com/binderjoe/cosmos-python-prototype.git@master
 ```
 
 ## Authentication

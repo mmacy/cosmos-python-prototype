@@ -1,0 +1,8 @@
+.mypy_cache/
+.vscode/
+env/
+
+__pycache__/
+*.py[cod]
+
+doc/build
