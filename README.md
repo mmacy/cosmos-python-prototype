@@ -43,17 +43,17 @@ You can get your account URI and account key in several ways, including with the
 RES_GROUP=<resource-group-name>
 ACCT_NAME=<cosmos-db-account-name>
 
-export ACCOUNT_HOST=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_NAME --query documentEndpoint --output tsv)
+export ACCOUNT_URI=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_NAME --query documentEndpoint --output tsv)
 export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $ACCT_NAME --query primaryMasterKey --output tsv)
 ```
 
-Once you've populated the `ACCOUNT_HOST` and `ACCOUNT_KEY` environment variables, you can create the **CosmosClient**.
+Once you've populated the `ACCOUNT_URI` and `ACCOUNT_KEY` environment variables, you can create the **CosmosClient**.
 
 ```Python
 from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
 
 import os
-url = os.environ['ACCOUNT_HOST']
+url = os.environ['ACCOUNT_URI']
 key = os.environ['ACCOUNT_KEY']
 client = CosmosClient(url, key)
 ```
@@ -183,6 +183,10 @@ Certain properties of an existing container can be modified. This example sets t
 database = client.get_database(test_database_name)
 container = database.get_container(test_container_name)
 database.set_container_properties(container, default_ttl=10)
+
+# Display the new TTL setting for the container
+container_props = database.get_container(test_container_name).properties
+print(json.dumps(container_props['defaultTtl']))
 ```
 
 For more information on TTL, see [Time to Live for Azure Cosmos DB data][cosmos_ttl].

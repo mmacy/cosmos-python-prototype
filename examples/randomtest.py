@@ -3,9 +3,9 @@ import os
 
 from azure.cosmos import CosmosClient, HTTPFailure
 
-AUTH_URL = os.environ["ACCOUNT_HOST"]
+AUTH_URI = os.environ["ACCOUNT_URI"]
 AUTH_KEY = os.environ["ACCOUNT_KEY"]
-client = CosmosClient(url=AUTH_URL, key=AUTH_KEY)
+client = CosmosClient(url=AUTH_URI, key=AUTH_KEY)
 
 def do_basic_stuff():
     for database in client.list_databases():
@@ -36,10 +36,10 @@ except HTTPFailure:
 container = database.create_container(
     id='containerwithspecificsettings',
     partition_key={
-        "paths": [  
-        "/AccountNumber"  
-        ],  
-        "kind": "Hash"  
+        "paths": [
+        "/AccountNumber"
+        ],
+        "kind": "Hash"
     }
 )
 

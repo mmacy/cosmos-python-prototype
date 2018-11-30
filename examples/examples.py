@@ -2,7 +2,7 @@ from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
 
 # All interaction with Cosmos DB starts with an instance of the CosmosClient
 import os
-url = os.environ['ACCOUNT_HOST']
+url = os.environ['ACCOUNT_URI']
 key = os.environ['ACCOUNT_KEY']
 client = CosmosClient(url, key)
 
@@ -63,11 +63,13 @@ updated_item = container.upsert_item(item) # ISSUE: do we update the item "in pl
 
 # Retrieve the properties of a database
 properties = database.properties
-print(json.dumps(properties))
+print(json.dumps(properties, indent=True))
 
 # Modify the properties of an existing container
 # This example sets the default time to live (TTL) for items in the container to 10 seconds
-# An item in container are deleted when the TTL expires since it was last edited
+# An item in container is deleted when the TTL expires since it was last edited
 database.set_container_properties(container, default_ttl=10)
-container = database.get_container(container)
-print(container)
+
+# Display the new TTL setting for the container
+container_props = database.get_container(test_container_name).properties
+print(json.dumps(container_props['defaultTtl']))

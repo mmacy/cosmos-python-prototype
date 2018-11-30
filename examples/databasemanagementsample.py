@@ -2,9 +2,9 @@ import os
 
 from azure.cosmos import CosmosClient, HTTPFailure
 
-AUTH_URL = os.environ.get("ACCOUNT_HOST")
+AUTH_URI = os.environ.get("ACCOUNT_URI")
 AUTH_KEY = os.environ.get("ACCOUNT_KEY")
-TEST_DB_NAME = "johanste-testdb"
+TEST_DB_NAME = "testdatabasemanagementdb"
 
 
 class DatabaseManagement:
@@ -60,7 +60,7 @@ class DatabaseManagement:
                 raise
 
 
-client = CosmosClient(AUTH_URL, AUTH_KEY)
+client = CosmosClient(AUTH_URI, AUTH_KEY)
 DatabaseManagement.find_database(client, TEST_DB_NAME)
 DatabaseManagement.create_database(client, TEST_DB_NAME)
 DatabaseManagement.read_database(client, TEST_DB_NAME)
