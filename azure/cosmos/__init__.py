@@ -74,7 +74,7 @@ class CosmosClient:
         :param fail_if_exists: Fail if database already exists.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Create a new database
+        **Example**: Create a new database.
 
         .. code-block:: python
             import os
@@ -195,11 +195,11 @@ class Database:
 
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
-        :param id: ID of container to create
-        :param partition_key: The partition key to use for the container 
-        :param indexing_policy: The indexing policy to apply to the container
-        :param default_ttl: Default TTL (time to live) for the container 
-        :raise HTTPFailure: The container creation failed
+        :param id: ID of container to create.
+        :param partition_key: The partition key to use for the container.
+        :param indexing_policy: The indexing policy to apply to the container.
+        :param default_ttl: Default TTL (time to live) for the container.
+        :raise HTTPFailure: The container creation failed.
 
         **Example:** Create a container with the name 'mycontainer' with default settings:
 
@@ -399,8 +399,8 @@ class Container:
 
     def get_item(self, id: "str") -> "Item":
         """
-        Get the item identified by `id`
-        :param str id: ID of item to retrieve
+        Get the item identified by `id`.
+        :param str id: ID of item to retrieve.
         :returns: Item if present.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
@@ -491,7 +491,7 @@ class Container:
         """ Create an item in the container.
 
         :param body: A dict-like object or string representing the item to create.
-        :raises `HTTPFailure`: 
+        :raises `HTTPFailure`:
 
         In order to replace an existing item, use the :func:`Container.upsert_item` method.
 
