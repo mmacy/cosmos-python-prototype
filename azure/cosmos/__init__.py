@@ -35,7 +35,7 @@ class User:
 
 class CosmosClient:
     """
-    Provides a client-side logical representation of an Azure Cosmos DB database account.
+    Provides a client-side logical representation of an Azure Cosmos DB account.
     Use this client to configure and execute requests to the Azure Cosmos DB service.
     """
 
@@ -66,11 +66,11 @@ class CosmosClient:
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
-        """ Create a new database with the given name (id)
+        """ Create a new database with the given ID (name)
 
         :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
-        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given id already exists
+        :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists
 
         **Example**: Creating a new database
         .. code-block:: python
@@ -104,7 +104,7 @@ class CosmosClient:
         """
         List databases in the Cosmos SQL Database Account. 
 
-        :param query: Cosmos DB SQL query. If omitted, all databases in the account will be listed.
+        :param query: Cosmos DB SQL query. If omitted, all databases in the account are listed.
         """
         if query:
             yield from [
@@ -121,8 +121,8 @@ class CosmosClient:
         """
         Delete the database with the given ID (name).
 
-        :param database: The id (name) of, or the database instance to delete. 
-        :raise HTTPFailure: If the call to delete the database fails.
+        :param database: The ID (name) of, or the database instance to delete. 
+        :raise HTTPFailure: If the database couldn't be deleted.
         """
         database_link = CosmosClient._get_database_link(database)
         self.client_context.DeleteDatabase(database_link)
@@ -138,7 +138,7 @@ class Database:
     A database also has associated users, each with a set of permissions to access various 
     other containers, stored procedures, triggers, user defined functions, or items
 
-    :ivar id: The id (name) of the database.
+    :ivar id: The ID (name) of the database.
     :ivar properties: A dictionary of system generated properties for this database. See below for the list of keys.
 
     An Azure Cosmos SQL Database has the following system generated (read-only) properties:
@@ -190,7 +190,7 @@ class Database:
         """
         Create a new container with the given ID (name). 
         
-        If a container with the given ID (name) already exists, an HTTPFailure with status_code 409 will be raised.
+        If a container with the given ID already exists, an HTTPFailure with status_code 409 will be raised.
 
         :param id: ID of container to create
         :param partition_key: The partition key to use for the container 
@@ -397,7 +397,7 @@ class Container:
     def get_item(self, id: "str") -> "Item":
         """
         Get the item identified by `id`
-        :param str id: ID of item to retreive
+        :param str id: ID of item to retrieve
         :returns: Item if present.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
@@ -490,7 +490,7 @@ class Container:
         :param body: A dict-like object or string representing the item to create.
         :raises `HTTPFailure`: 
 
-        In order to replace an existing item, use the :func:`Collection.upsert_item` method.
+        In order to replace an existing item, use the :func:`Container.upsert_item` method.
 
         """
         result = self.client_context.CreateItem(
