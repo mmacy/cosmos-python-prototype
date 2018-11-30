@@ -114,7 +114,7 @@ class DocumentManagement:
                      'product_code' : 'A-123',      # Notice how in item details we no longer reference a ProductId.
                      'product_name' : 'Product 1',  # Instead, we've decided to de-normalize our schema and include
                      'currency_symbol' : '$',       # the Product details relevant to the Order on the Order directly.
-                     'currecny_code' : 'USD',       # This is a typical refactor that happens in the course of an application
+                     'currency_code' : 'USD',       # This is a typical refactor that happens in the course of an application
                      'unit_price' : 17.1,           # that would have previously required schema changes, data migrations, etc.
                      'line_price' : 5.7
                     }
