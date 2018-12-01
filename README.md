@@ -1,14 +1,16 @@
-# Azure Cosmos DB SDK for Python
+# Azure Cosmos DB SQL API SDK for Python
 
-The Azure Cosmos DB SDK for Python provides support for working with Cosmos DB resources like databases, containers, and items. Use the Python SDK to create, read, update, and delete data using the API of your choice: SQL, MongoDB, Gremlin, Cassandra, and Azure Table.
+Azure Cosmos DB is a globally distributed, multi-model database service that supports document, key-value, wide-column, and graph databases. Several APIs are supported, including SQL, MongoDB, Gremlin, Cassandra, and Azure Table.
+
+This SDK is suitable for working with SQL API-based Cosmos DB accounts.
 
 ## Prerequisites
 
 ### Required
 
 * Azure subscription - [Create a free account][azure_sub]
-* Azure [Cosmos DB account][cosmos_account]
-* [Python 3.7+][python]
+* Azure [Cosmos DB account][cosmos_account] - SQL API
+* [Python 3.6+][python]
 
 ## Installation
 
@@ -37,6 +39,8 @@ pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https
 
 Interaction with Cosmos DB starts with an instance of the **CosmosClient** class. To create the **CosmosClient** object, supply your Cosmos DB account's URI and one of its account keys to the **CosmosClient** constructor.
 
+### Get credentials
+
 You can get your account URI and account key in several ways, including with the [Azure CLI][azure_cli] and [Azure portal][azure_portal]. The Bash snippet below retrieves the account URI and its primary master key with the Azure CLI, and exports those values as environment variables.
 
 ```Bash
@@ -46,6 +50,8 @@ ACCT_NAME=<cosmos-db-account-name>
 export ACCOUNT_URI=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_NAME --query documentEndpoint --output tsv)
 export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $ACCT_NAME --query primaryMasterKey --output tsv)
 ```
+
+### Create client
 
 Once you've populated the `ACCOUNT_URI` and `ACCOUNT_KEY` environment variables, you can create the **CosmosClient**.
 
@@ -125,7 +131,9 @@ container.upsert_item({
 
 ### Query the database
 
-Query a container for a list of items:
+A Cosmos DB SQL API database account supports querying the items in a container using SQL syntax.
+
+This example queries a container for items with a specific `id`:
 
 ```Python
 database = client.get_database(test_database_name)
@@ -139,6 +147,8 @@ import json
 for item in items:
     print(json.dumps(item, indent=True))
 ```
+
+For more information on querying Cosmos DB databases using the SQL API, see [Query Azure Cosmos DB data with SQL queries][cosmos_sql_queries].
 
 ### Insert and update data
 
@@ -255,6 +265,7 @@ For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos
 [cosmos_item]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-items
 [cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items
 [cosmos_request_units]: https://docs.microsoft.com/azure/cosmos-db/request-units
+[cosmos_sql_queries]: https://docs.microsoft.com/azure/cosmos-db/how-to-sql-query
 [cosmos_ttl]: https://docs.microsoft.com/azure/cosmos-db/time-to-live
 [pip]: https://pypi.org/project/pip/
 [python]: https://www.python.org/downloads/
