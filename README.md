@@ -39,6 +39,8 @@ pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https
 
 Interaction with Cosmos DB starts with an instance of the **CosmosClient** class. To create the **CosmosClient** object, supply your Cosmos DB account's URI and one of its account keys to the **CosmosClient** constructor.
 
+### Get credentials
+
 You can get your account URI and account key in several ways, including with the [Azure CLI][azure_cli] and [Azure portal][azure_portal]. The Bash snippet below retrieves the account URI and its primary master key with the Azure CLI, and exports those values as environment variables.
 
 ```Bash
@@ -48,6 +50,8 @@ ACCT_NAME=<cosmos-db-account-name>
 export ACCOUNT_URI=$(az cosmosdb show --resource-group $RES_GROUP --name $ACCT_NAME --query documentEndpoint --output tsv)
 export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $ACCT_NAME --query primaryMasterKey --output tsv)
 ```
+
+### Create client
 
 Once you've populated the `ACCOUNT_URI` and `ACCOUNT_KEY` environment variables, you can create the **CosmosClient**.
 
