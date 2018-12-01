@@ -73,6 +73,7 @@ class CosmosClient:
 
         :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
+        :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
         **Example**: Create a new database.
@@ -454,7 +455,7 @@ class Container:
             items = container.query_items(
                 query='SELECT * FROM Families f WHERE f.address.state = @addressState',
                 parameters=[
-                    dict('name'='@addressState', value='NY')
+                    dict(name='@addressState', value='NY')
                 ]
             )
 
