@@ -2,7 +2,7 @@
 
 Azure Cosmos DB is a multi-model database service that supports document, key-value, wide-column, and graph databases. Several APIs are supported, including SQL, MongoDB, Gremlin, Cassandra, and Azure Table.
 
-This SDK supports SQL API-based Cosmos DB accounts. Manage the resources in your database with Python, and query the documents in your database with familiar SQL-like syntax.
+This SDK supports SQL API-based Cosmos DB accounts.
 
 ## Prerequisites
 

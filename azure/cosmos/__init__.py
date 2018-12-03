@@ -44,6 +44,7 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
+
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
 
@@ -474,6 +475,11 @@ class Container:
         yield from [Item(headers, item) for item in items]
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
+        """ Replaces the specified item if it exists in the container.
+
+        :param body: A dict-like object or string representing the item to replace.
+        :raises `HTTPFailure`:
+        """
         item_link = Container._document_link(item)
         data = self.client_context.ReplaceItem(
             document_link=item_link, new_document=body
@@ -513,7 +519,7 @@ class Container:
         """ Delete the specified item from the container.
 
         :param item: The :class:`Item` to delete from the container.
-        :raises `HTTPFailure`:
+        :raises `HTTPFailure`: The item wasn't deleted successfully. If the item does not exist in the container, a `404` error is returned.
 
         """
         document_link = Container._document_link(item)
