@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Azure Cosmos SQL Database
+Azure Cosmos DB SDK for Python
 =============================================
 
 .. toctree::
@@ -12,8 +12,6 @@ Azure Cosmos SQL Database
 
 .. automodule:: azure.cosmos
     :members:
-    :undoc-members:
-
 
 Indices and tables
 ==================

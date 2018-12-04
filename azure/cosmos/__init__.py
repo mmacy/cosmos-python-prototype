@@ -44,6 +44,7 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
+
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
 
@@ -135,7 +136,7 @@ class CosmosClient:
 
 
 class Database:
-    """ Represents an Azure Cosmos SQL :class:`Database`.
+    """ Represents an Azure Cosmos DB SQL API database.
 
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
@@ -144,21 +145,16 @@ class Database:
     other containers, stored procedures, triggers, user defined functions, or items
 
     :ivar id: The ID (name) of the database.
-    :ivar properties: A dictionary of system generated properties for this database. See below for the list of keys.
+    :ivar properties: A dictionary of system-generated properties for this database. See below for the list of keys.
 
-    An Azure Cosmos SQL Database has the following system generated (read-only) properties:
+    An Azure Cosmos DB SQL API database has the following system-generated properties; these properties are read-only:
 
-    _rid:   The resource ID.
-
-    _ts:    Specifies the last updated timestamp of the resource. The value is a timestamp.
-
-    _self:	The unique addressable URI for the resource.
-
-    _etag:	The resource etag required for optimistic concurrency control.
-
-    _colls:	The addressable path of the collections resource.
-
-    _users:	The addressable path of the users resource.
+    * `_rid`:   The resource ID.
+    * `_ts`:    Specifies the last updated timestamp of the resource. The value is a timestamp.
+    * `_self`:	The unique addressable URI for the resource.
+    * `_etag`:	The resource etag required for optimistic concurrency control.
+    * `_colls`:	The addressable path of the collections resource.
+    * `_users`:	The addressable path of the users resource.
     """
 
     def __init__(
@@ -202,6 +198,7 @@ class Database:
         :param indexing_policy: The indexing policy to apply to the container.
         :param default_ttl: Default TTL (time to live) for the container.
         :raise HTTPFailure: The container creation failed.
+
         **Example:** Create a container name 'mycontainer' with default settings:
 
         .. code-block:: python
@@ -265,9 +262,9 @@ class Database:
                 container = database.get_container('customers')
             except HTTPFailure as failure:
                 if failure.status_code == 404:
-                    print('Container did not exist...')
+                    print('Container does not exist.')
                 else:
-                    print(f'Failed to retrieve container - status code:{failure.status_code}')
+                    print(f'Failed to retrieve container. Status code:{failure.status_code}')
         """
         collection_link = getattr(
             container, "collection_link", f"{self.database_link}/colls/{container}"
@@ -322,8 +319,7 @@ class Database:
         default_ttl=None,
         conflict_resolution_policy=None,
     ):
-        """
-        Update the properties of the container. Property changes are persisted immediately.
+        """ Update the properties of the container. Property changes are persisted immediately.
         """
         container_id = getattr(container, "id", container)
         parameters = {
@@ -348,23 +344,48 @@ class Database:
         return user_link
 
     def create_user(self, user, options=None):
+        """ Create a new user in the database.
+
+        :param user: A dict-like object with an `id` key and value.
+
+        The user ID must be unique within the database, and consist of no more than 255 characters.
+
+        .. code-block:: python
+
+            database.create_user(dict(
+                id='Walter Harp'
+                ))
+
+        """
         database = cast("Database", self)
         return database.client_context.CreateUser(database.database_link, user, options)
 
     def get_user(self, id):
+        """ Get the specified user from the database.
+
+        :param id: The ID of the user to retrieve.
+        """
         database = cast("Database", self)
         return database.client_context.ReadUser(self.get_user_link(id))
 
     def list_users(self, query=None):
+        """ Get all database users.
+        """
         database = cast("Database", self)
         yield from [User(user) for user in database.client_context.ReadUsers(query)]
 
     def delete_user(self, user):
+        """ Delete the specified user from the database.
+        """
         database = cast("Database", self)
         database.client_context.DeleteUser(self.get_user_link(id))
 
 
 class Item(dict):
+    """ Represents a document in an Azure Cosmos DB SQL API container.
+
+    To create, read, update, and delete Items, use the associated methods on the :class:`Container`.
+    """
     def __init__(self, headers: "Dict[str, Any]", data: "Dict[str, Any]"):
         super().__init__()
         self.response_headers = headers
@@ -372,11 +393,12 @@ class Item(dict):
 
 
 class Container:
-    """ An Azure Cosmos SQL container.
+    """ An Azure Cosmos DB container.
+
+    A container in an Azure Cosmos DB SQL API database is a collection of documents, each of which represented as an :class:`Item`.
 
     :ivar id: ID (name) of the container
     :session_token: The session token for the container.
-
     """
 
     def __init__(
@@ -402,8 +424,9 @@ class Container:
     def get_item(self, id: "str") -> "Item":
         """
         Get the item identified by `id`.
+
         :param str id: ID of item to retrieve.
-        :returns: Item if present.
+        :returns: :class:`Item`, if present in the container.
         """
         doc_link = f"{self.collection_link}/docs/{id}"
         result = self.client_context.ReadItem(document_link=doc_link)
@@ -422,6 +445,8 @@ class Container:
         yield from [Item(headers=headers, data=item) for item in items]
 
     def query_items_change_feed(self, options=None):
+        """ Get a sorted list of items that were changed, in the order in which they were modified.
+        """
         items = self.client_context.QueryItemsChangeFeed(
             self.collection_link, options=options
         )
@@ -439,6 +464,7 @@ class Container:
 
         :param query: The Azure Cosmos DB SQL query to execute.
         :param parameters: Optional array of parameters.
+        :returns: An `Iterable` containing each :class:`Item` returned by the query, if any.
 
         **Example:** Find all families in the state of NY.
 
@@ -472,6 +498,11 @@ class Container:
         yield from [Item(headers, item) for item in items]
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
+        """ Replaces the specified item if it exists in the container.
+
+        :param body: A dict-like object or string representing the item to replace.
+        :raises `HTTPFailure`:
+        """
         item_link = Container._document_link(item)
         data = self.client_context.ReplaceItem(
             document_link=item_link, new_document=body
@@ -479,9 +510,12 @@ class Container:
         return Item(headers=self.client_context.last_response_headers, data=data)
 
     def upsert_item(self, body: "Dict[str, Any]") -> "Item":
-        """ Insert or update the given item.
+        """ Insert or update the specified item.
 
-        If the item already exists, it will be replaced. If it does not, it will be inserted.
+        :param body: A dict-like object or string representing the item to update or insert.
+        :raises `HTTPFailure`:
+
+        If the item already exists in the container, it is replaced. If it does not, it is inserted.
         """
 
         result = self.client_context.UpsertItem(
@@ -493,9 +527,10 @@ class Container:
         """ Create an item in the container.
 
         :param body: A dict-like object or string representing the item to create.
+        :returns: The :class:`Item` inserted into the container.
         :raises `HTTPFailure`:
 
-        In order to replace an existing item, use the :func:`Container.upsert_item` method.
+        To update or replace an existing item, use the :func:`Container.upsert_item` method.
 
         """
         result = self.client_context.CreateItem(
@@ -504,6 +539,12 @@ class Container:
         return Item(headers=self.client_context.last_response_headers, data=result)
 
     def delete_item(self, item: "Item") -> "None":
+        """ Delete the specified item from the container.
+
+        :param item: The :class:`Item` to delete from the container.
+        :raises `HTTPFailure`: The item wasn't deleted successfully. If the item does not exist in the container, a `404` error is returned.
+
+        """
         document_link = Container._document_link(item)
         self.client_context.DeleteItem(document_link=document_link)
 
