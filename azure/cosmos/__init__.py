@@ -145,7 +145,7 @@ class Database:
     other containers, stored procedures, triggers, user defined functions, or items
 
     :ivar id: The ID (name) of the database.
-    :ivar properties: A dictionary of system0generated properties for this database. See below for the list of keys.
+    :ivar properties: A dictionary of system-generated properties for this database. See below for the list of keys.
 
     An Azure Cosmos DB SQL API database has the following system-generated properties; these properties are read-only:
 
@@ -198,6 +198,7 @@ class Database:
         :param indexing_policy: The indexing policy to apply to the container.
         :param default_ttl: Default TTL (time to live) for the container.
         :raise HTTPFailure: The container creation failed.
+
         **Example:** Create a container name 'mycontainer' with default settings:
 
         .. code-block:: python
@@ -318,8 +319,7 @@ class Database:
         default_ttl=None,
         conflict_resolution_policy=None,
     ):
-        """
-        Update the properties of the container. Property changes are persisted immediately.
+        """ Update the properties of the container. Property changes are persisted immediately.
         """
         container_id = getattr(container, "id", container)
         parameters = {
@@ -344,18 +344,39 @@ class Database:
         return user_link
 
     def create_user(self, user, options=None):
+        """ Create a new user in the database.
+
+        :param user: A dict-like object with an `id` key and value.
+
+        The user ID must be unique within the database, and consist of no more than 255 characters.
+
+        .. code-block:: python
+
+            database.create_user(dict(
+                id='Walter Harp'
+                ))
+
+        """
         database = cast("Database", self)
         return database.client_context.CreateUser(database.database_link, user, options)
 
     def get_user(self, id):
+        """ Get the specified user from the database.
+
+        :param id: The ID of the user to retrieve.
+        """
         database = cast("Database", self)
         return database.client_context.ReadUser(self.get_user_link(id))
 
     def list_users(self, query=None):
+        """ Get all database users.
+        """
         database = cast("Database", self)
         yield from [User(user) for user in database.client_context.ReadUsers(query)]
 
     def delete_user(self, user):
+        """ Delete the specified user from the database.
+        """
         database = cast("Database", self)
         database.client_context.DeleteUser(self.get_user_link(id))
 
@@ -424,6 +445,8 @@ class Container:
         yield from [Item(headers=headers, data=item) for item in items]
 
     def query_items_change_feed(self, options=None):
+        """ Get a sorted list of items that were changed, in the order in which they were modified.
+        """
         items = self.client_context.QueryItemsChangeFeed(
             self.collection_link, options=options
         )
