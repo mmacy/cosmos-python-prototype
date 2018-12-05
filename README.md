@@ -2,7 +2,7 @@
 
 Azure Cosmos DB is a multi-model database service that supports document, key-value, wide-column, and graph databases. Several APIs are supported, including SQL, MongoDB, Gremlin, Cassandra, and Azure Table.
 
-This SDK supports SQL API-based Cosmos DB accounts.
+The Azure Cosmos DB SQL API SDK for Python enables you to manage database resources like containers (collections of JSON documents) and items (JSON documents), as well as query the documents in your database using familiar SQL-like syntax.
 
 ## Prerequisites
 
@@ -69,8 +69,8 @@ client = CosmosClient(url, key)
 Once you have an initialized **CosmosClient**, you can interact with the primary resource types in Cosmos DB:
 
 * [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
-* [Container][cosmos_container]: Each database in a Cosmos DB SQL API account houses one or more *containers*. A container is labeled "Collection" in the Azure portal.
-* [Item][cosmos_item]: Containers hold one or more *items*. Items represent different entity types depending on the database API. Items are labeled as "Documents" in the Azure portal.
+* [Container][cosmos_container]: Each database in a Cosmos DB SQL API account houses one or more *containers*. A container is a collection of JSON documents (items), and is labeled a "Collection" in the Azure portal.
+* [Item][cosmos_item]: Containers hold one or more *items*. Items are the JSON documents in your containers, and labeled "Documents" in the Azure portal.
 
 For more information on these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
@@ -131,7 +131,7 @@ container.upsert_item({
 
 ### Query the database
 
-A Cosmos DB SQL API database account supports querying the items in a container using SQL syntax.
+A Cosmos DB SQL API database account supports querying the items in a container using SQL-like syntax.
 
 This example queries a container for items with a specific `id`:
 
@@ -145,11 +145,13 @@ for item in container.query_items(query='SELECT * FROM mycontainer r WHERE r.id=
     print(json.dumps(item, indent=True))
 ```
 
+> NOTE: Although you can specify any value for the container name in the `FROM` clause, we recommend you use the container name for consistency.
+
 For more information on querying Cosmos DB databases using the SQL API, see [Query Azure Cosmos DB data with SQL queries][cosmos_sql_queries].
 
 ### Insert and update data
 
-To insert items into the container, pass a dictionary containing your data to `Container.upsert_item`:
+To insert items into the container, pass a dictionary or JSON string containing your data to `Container.upsert_item`:
 
 ```Python
 database = client.get_database(test_database_name)
