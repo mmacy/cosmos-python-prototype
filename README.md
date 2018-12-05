@@ -78,84 +78,58 @@ For more information on these resources, see [Working with Azure Cosmos database
 
 The following sections provide several example code snippets covering some of the most common Cosmos DB tasks, including:
 
-* [Create a database and container](#create-a-database-and-container)
+* [Create a database](#create-a-database)
+* [Create a container](#create-a-container)
 * [Get an existing container](#get-an-existing-container)
+* [Insert data](#insert-data)
 * [Query the database](#query-the-database)
-* [Insert and update data](#insert-and-update-data)
 * [Get database properties](#get-database-properties)
 * [Modify container properties](#modify-container-properties)
 
-The example snippets are taken from [examples.py](examples/examples.py).
-
-### Create a database and container
+### Create a database
 
 After authenticating your **CosmosClient**, you can work with any resource in the account. The code snippet below creates a SQL API database, which is the default when no API is specified when `create_database` is invoked. It also creates a container in the database, into which you can insert items.
 
 ```Python
-test_database_name = 'testDatabase'
-test_container_name = 'testContainer'
+database_name = 'myDatabase'
+container_name = 'myContainer'
 
-db = client.create_database(id=test_database_name, fail_if_exists=False)
-try:
-    db.create_container(id=test_container_name)
-except HTTPFailure as e:
-    if e.status_code != 409:
-        raise
-    db.get_container(test_container_name)
+database = client.create_database(id=database_name, fail_if_exists=False)
 ```
 
 The preceding snippet also handles the `HTTPFailure` exception if the container creation failed. For more information on error handling and troubleshooting, see the [Troubleshooting](#troubleshooting) section.
 
+### Create a container
+
+This example creates a container with default settings. If a container with the same name already exists in the database (generating a `409 Conflict` error), the existing container is returned instead.
+
+```Python
+try:
+    container = database.create_container(id=container_name)
+except HTTPFailure as e:
+    if e.status_code != 409:
+        raise
+    container = database.get_container(container_name)
+```
+
 ### Get an existing container
 
-Get an existing container using a known database and container name, then insert an item:
+Retrieve an existing container from the database:
 
 ```Python
-container = Container(client.client_context, database=test_database_name, id=test_container_name)
-container.upsert_item({
-    'id': 'something',
-    'value': 'new'
-})
+database = client.get_database(database_name)
+container = database.get_container(container_name)
 ```
 
-You can also get a container from the database object:
+### Insert data
+
+To insert items into a container, pass a dictionary or JSON string containing your data to `Container.upsert_item`.
+
+This example inserts several items into the container, each with a unique ID. If you don't include an `id` field in the items you insert, Cosmos DB generates an ID for you in the form of a GUID.
 
 ```Python
-database = client.get_database(test_database_name)
-container = database.get_container(test_container_name)
-container.upsert_item({
-    'id': 'another',
-    'value': 'something'
-})
-```
-
-### Query the database
-
-A Cosmos DB SQL API database account supports querying the items in a container using SQL-like syntax.
-
-This example queries a container for items with a specific `id`:
-
-```Python
-database = client.get_database(test_database_name)
-container = database.get_container(test_container_name)
-
-# Enumerate the returned items
-import json
-for item in container.query_items(query='SELECT * FROM mycontainer r WHERE r.id="something"'):
-    print(json.dumps(item, indent=True))
-```
-
-> NOTE: Although you can specify any value for the container name in the `FROM` clause, we recommend you use the container name for consistency.
-
-For more information on querying Cosmos DB databases using the SQL API, see [Query Azure Cosmos DB data with SQL queries][cosmos_sql_queries].
-
-### Insert and update data
-
-To insert items into the container, pass a dictionary or JSON string containing your data to `Container.upsert_item`:
-
-```Python
-database = client.get_database(test_database_name)
-container = database.get_container(test_container_name)
+database = client.get_database(database_name)
+container = database.get_container(container_name)
 
 for i in range(1, 10):
     container.upsert_item(dict(
@@ -166,20 +140,32 @@ for i in range(1, 10):
     )
 ```
 
-Update an existing item:
+### Query the database
+
+A Cosmos DB SQL API database account supports querying the items in a container using SQL-like syntax.
+
+This example queries a container for items with a specific `id`:
 
 ```Python
-item = items[0]
-item['firstName'] = 'Some Other Name'
-updated_item = container.upsert_item(item)
+database = client.get_database(database_name)
+container = database.get_container(container_name)
+
+# Enumerate the returned items
+import json
+for item in container.query_items(query='SELECT * FROM mycontainer r WHERE r.id="something"'):
+    print(json.dumps(item, indent=True))
 ```
+
+> NOTE: Although you can specify *any* value for the container name in the `FROM` clause, we recommend you use the container name for consistency.
+
+For more information on querying Cosmos DB databases using the SQL API, see [Query Azure Cosmos DB data with SQL queries][cosmos_sql_queries].
 
 ### Get database properties
 
 Get and display the properties of a database:
 
 ```Python
-database = client.get_database(test_database_name)
+database = client.get_database(database_name)
 properties = database.properties
 print(json.dumps(properties))
 ```
@@ -189,12 +175,12 @@ print(json.dumps(properties))
 Certain properties of an existing container can be modified. This example sets the default time to live (TTL) for items in the container to 10 seconds:
 
 ```Python
-database = client.get_database(test_database_name)
-container = database.get_container(test_container_name)
+database = client.get_database(database_name)
+container = database.get_container(container_name)
 database.set_container_properties(container, default_ttl=10)
 
 # Display the new TTL setting for the container
-container_props = database.get_container(test_container_name).properties
+container_props = database.get_container(container_name).properties
 print(json.dumps(container_props['defaultTtl']))
 ```
 
@@ -212,7 +198,7 @@ For example, if you try to create a container using an ID (name) that's already 
 
 ```Python
 try:
-    database.create_container(id=test_container_name)
+    database.create_container(id=container_name)
 except HTTPFailure as e:
     if e.status_code == 409:
         print("""Error creating container.
