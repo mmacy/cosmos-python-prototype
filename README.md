@@ -69,8 +69,8 @@ client = CosmosClient(url, key)
 Once you have an initialized **CosmosClient**, you can interact with the primary resource types in Cosmos DB:
 
 * [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
-* [Container][cosmos_container]: Each database houses one or more containers. The container type is determined by the selected database API.
-* [Item][cosmos_item]: Containers hold one or more items. Items represent different entity types depending on the database API.
+* [Container][cosmos_container]: Each database in a Cosmos DB SQL API account houses one or more *containers*. A container is labeled "Collection" in the Azure portal.
+* [Item][cosmos_item]: Containers hold one or more *items*. Items represent different entity types depending on the database API. Items are labeled as "Documents" in the Azure portal.
 
 For more information on these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
@@ -139,12 +139,9 @@ This example queries a container for items with a specific `id`:
 database = client.get_database(test_database_name)
 container = database.get_container(test_container_name)
 
-# Get a list of items from the container
-items = list(container.query_items(query='SELECT * FROM root r WHERE r.id="something"'))
-
 # Enumerate the returned items
 import json
-for item in items:
+for item in container.query_items(query='SELECT * FROM mycontainer r WHERE r.id="something"'):
     print(json.dumps(item, indent=True))
 ```
 

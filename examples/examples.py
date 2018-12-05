@@ -20,7 +20,7 @@ except HTTPFailure as e:
 
 # Retrieve a container by using known database and container names, then
 # insert an item:
-container = Container(client.client_context, database=test_database_name, id=test_container_name)
+container = Container(client, database=test_database_name, id=test_container_name)
 container.upsert_item({
     'id': 'something',
     'value': 'new'
@@ -35,12 +35,9 @@ container.upsert_item({
     'value': 'something'
 })
 
-# With a Container object, you can query items within it:
-items = list(container.query_items(query='SELECT * FROM root r WHERE r.id="something"'))
-
-# Enumerate the items you've retrieved with your query:
+# With a Container object, you can query the items within it.
 import json
-for item in items:
+for item in container.query_items(query='SELECT * FROM root r WHERE r.id="something"'):
     print(json.dumps(item, indent=True))
 
 # It should be (almost) free to ask the length of a query
