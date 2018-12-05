@@ -20,7 +20,7 @@ except HTTPFailure as e:
 
 # Retrieve a container by using known database and container names, then
 # insert an item:
-container = Container(client, database=test_database_name, id=test_container_name)
+container = Container(client.client_context, database=test_database_name, id=test_container_name)
 container.upsert_item({
     'id': 'something',
     'value': 'new'
