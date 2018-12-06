@@ -1,13 +1,14 @@
 import collections.abc
 
 
-class QueryResultIteratable(collections.abc.Iterator):
+class QueryResultIterator(collections.abc.Iterator):
     """ Iterator over query results from Azure Cosmos SQL DB
 
     The type of each item returned by the iterator depends on the specific
     query used to generate the result set. It may be a scalar value for aggregate
     functions, or it may be a dictionary for projections.
     """
+
     def __init__(self, inner, headers=None):
         self.headers = headers
         self._inner = inner

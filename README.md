@@ -139,8 +139,8 @@ This example queries a container for items with a specific `id`:
 database = client.get_database(test_database_name)
 container = database.get_container(test_container_name)
 
-# Get a list of items from the container
-items = list(container.query_items(query='SELECT * FROM root r WHERE r.id="something"'))
+# Get a list of results from the container
+items = container.query_items(query='SELECT * FROM root r WHERE r.id="something"')
 
 # Enumerate the returned items
 import json
