@@ -466,6 +466,10 @@ class Container:
         :param parameters: Optional array of parameters.
         :returns: An `Iterable` containing each :class:`Item` returned by the query, if any.
 
+        You can use any value for the container name in the FROM clause, but typically the container name is used.
+        In the examples below, the container name is "Families," and is aliased as "f" for more succinct referencing
+        in the WHERE clause.
+
         **Example:** Find all families in the state of NY.
 
         .. code-block:: python
