@@ -6,6 +6,7 @@ __all__ = ["CosmosClient", "Database", "Container", "Item"]
 
 
 from internal.cosmos.errors import HTTPFailure
+from .query_iterator import QueryResultIteratable
 
 from typing import (
     Any,
@@ -459,8 +460,8 @@ class Container:
         parameters: "Optional[List]" = None,
         options=None,
         partition_key: "Optional[str]" = None,
-    ) -> "Iterable[Item]":
-        """Return all items matching the given `query`.
+    ) -> "Iterable[Any]":
+        """Return all results matching the given `query`.
 
         :param query: The Azure Cosmos DB SQL query to execute.
         :param parameters: Optional array of parameters.
@@ -495,7 +496,8 @@ class Container:
             partition_key=partition_key,
         )
         headers = self.client_context.last_response_headers
-        yield from [Item(headers, item) for item in items]
+        items_iteratable = iter(items)
+        return QueryResultIteratable(items_iteratable, headers=headers)
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
         """ Replaces the specified item if it exists in the container.
