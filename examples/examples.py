@@ -91,13 +91,26 @@ item['productModel'] = 'DISCONTINUED'
 updated_item = container.upsert_item(item)
 # [END update_item]
 
-# Query the items in a container using SQL-like syntax. This query
+# Query the items in a container using SQL-like syntax. This example
 # gets all items whose product model hasn't been discontinued.
 # [START query_items]
 import json
 for item in container.query_items(query='SELECT * FROM products p WHERE p.productModel <> "DISCONTINUED"'):
     print(json.dumps(item, indent=True))
 # [END query_items]
+
+# Parameterized queries are also supported. This example
+# gets all items whose product model has been discontinued.
+# [START query_items_param]
+discontinued_items = container.query_items(
+    query='SELECT * FROM products p WHERE p.productModel = @model',
+    parameters=[
+        dict(name='@model', value='DISCONTINUED')
+    ]
+)
+for item in discontinued_items:
+    print(json.dumps(item, indent=True))
+# [END query_items_param]
 
 # Retrieve the properties of a database
 # [START get_database_properties]
@@ -117,3 +130,16 @@ database.set_container_properties(container, default_ttl=3600)
 container_props = database.get_container(container_name).properties
 print(f"New container TTL: {json.dumps(container_props['defaultTtl'])}")
 # [END set_container_properties]
+
+# Create a user in the database.
+# [START create_user]
+try:
+    database.create_user(dict(
+        id='Walter Harp'
+        ))
+except HTTPFailure as failure:
+    if failure.status_code == 409:
+        print('A user with that ID already exists.')
+    else:
+        print(f'Failed to create user. Status code:{failure.status_code}')
+# [END create_user]

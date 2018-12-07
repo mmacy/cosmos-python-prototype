@@ -48,7 +48,7 @@ class CosmosClient:
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
 
-        **Example**: Create a new client instance.
+        **Example:** Create a new instance of the Cosmos DB client.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_client]
@@ -76,7 +76,7 @@ class CosmosClient:
         :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Create a database in the Cosmos DB account.
+        **Example:** Create a database in the Cosmos DB account.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_database]
@@ -138,8 +138,9 @@ class Database:
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
 
-    A database also has associated users, each with a set of permissions to access various
-    other containers, stored procedures, triggers, user defined functions, or items
+    A database can also have associated users, each of which configured with
+    a set of permissions for accessing certain containers, stored procedures,
+    triggers, user defined functions, or items.
 
     :ivar id: The ID (name) of the database.
     :ivar properties: A dictionary of system-generated properties for this database. See below for the list of keys.
@@ -147,7 +148,7 @@ class Database:
     An Azure Cosmos DB SQL API database has the following system-generated properties; these properties are read-only:
 
     * `_rid`:   The resource ID.
-    * `_ts`:    Specifies the last updated timestamp of the resource. The value is a timestamp.
+    * `_ts`:    When the resource was last updated. The value is a timestamp.
     * `_self`:	The unique addressable URI for the resource.
     * `_etag`:	The resource etag required for optimistic concurrency control.
     * `_colls`:	The addressable path of the collections resource.
@@ -190,13 +191,13 @@ class Database:
 
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
-        :param id: ID of container to create.
+        :param id: ID (name) of container to create.
         :param partition_key: The partition key to use for the container.
         :param indexing_policy: The indexing policy to apply to the container.
-        :param default_ttl: Default TTL (time to live) for the container.
+        :param default_ttl: Default time to live (TTL) for items in the container. If unspecified, items do not expire.
         :raise HTTPFailure: The container creation failed.
 
-        **Example:** Create a container name 'mycontainer' with default settings:
+        **Example:** Create a container with default settings.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_container]
@@ -204,7 +205,7 @@ class Database:
             :language: python
             :dedent: 0
 
-        **Example:** Create a container named 'containerwithspecificsettings' with a custom partition key.
+        **Example:** Create a container with specific settings; in this case, a custom partition key.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_container_with_settings]
@@ -274,7 +275,7 @@ class Database:
         :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
         :param parameters: Parameters for the query. Only applicable if a query has been specified.
 
-        **Example**: List all containers in a database.
+        **Example:** List all containers in the database.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START list_containers]
@@ -348,11 +349,13 @@ class Database:
 
         The user ID must be unique within the database, and consist of no more than 255 characters.
 
-        .. code-block:: python
+        **Example:** Create a database user.
 
-            database.create_user(dict(
-                id='Walter Harp'
-                ))
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_user]
+            :end-before: [END create_user]
+            :language: python
+            :dedent: 0
 
         """
         database = cast("Database", self)
@@ -426,7 +429,7 @@ class Container:
         :param str id: ID of item to retrieve.
         :returns: :class:`Item`, if present in the container.
 
-        **Example**: Get an item from the database and update one of its properties.
+        **Example:** Get an item from the database and update one of its properties.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START update_item]
@@ -477,24 +480,21 @@ class Container:
         In the examples below, the container name is "products," and is aliased as "p" for easier referencing
         in the WHERE clause.
 
-        **Example:** Get all products that haven't been discontinued.
+        **Example:** Get all products that have not been discontinued.
 
         .. literalinclude:: ../../examples/examples.py
-            :start-after: [START update_item]
-            :end-before: [END update_item]
+            :start-after: [START query_items]
+            :end-before: [END query_items]
             :language: python
             :dedent: 0
 
-        **Example:** Parameterized query to find all families in the state of NY.
+        **Example:** Parameterized query to get all products that have been discontinued.
 
-        .. code-block:: python
-
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = @addressState',
-                parameters=[
-                    dict(name='@addressState', value='NY')
-                ]
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START query_items_param]
+            :end-before: [END query_items_param]
+            :language: python
+            :dedent: 0
 
         """
         items = self.client_context.QueryItems(
