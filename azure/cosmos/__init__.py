@@ -50,12 +50,11 @@ class CosmosClient:
 
         **Example**: Create a new client instance.
 
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_client]
+            :end-before: [END create_client]
+            :language: python
+            :dedent: 0
 
         """
         self.client_context = ClientContext(
@@ -77,15 +76,13 @@ class CosmosClient:
         :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Create a new database.
+        **Example**: Create a database in the Cosmos DB account.
 
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
-            database = client.create_database('nameofdatabase')
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_database]
+            :end-before: [END create_database]
+            :language: python
+            :dedent: 0
 
         """
         try:
@@ -201,23 +198,19 @@ class Database:
 
         **Example:** Create a container name 'mycontainer' with default settings:
 
-        .. code-block:: python
-
-            container = database.create_container('mycontainer')
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container]
+            :end-before: [END create_container]
+            :language: python
+            :dedent: 0
 
         **Example:** Create a container named 'containerwithspecificsettings' with a custom partition key.
 
-        .. code-block:: python
-
-            container = database.create_container(
-                id='containerwithspecificsettings',
-                partition_key={
-                    "paths": [
-                    "/AccountNumber"
-                    ],
-                    "kind": "Hash"
-                }
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container_with_settings]
+            :end-before: [END create_container_with_settings]
+            :language: python
+            :dedent: 0
 
         """
         definition = dict(id=id)
@@ -250,21 +243,17 @@ class Database:
         self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
-        """ Get the container with the ID (name) `container`.
+        """ Get the specified `Container`, or a container with specified ID (name).
 
         :param container: The ID (name) of the container, or a :class:`Container` instance.
         :raise `HTTPFailure`: Raised if the container couldn't be retrieved. This includes if the container does not exist.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START get_container]
+            :end-before: [END get_container]
+            :language: python
+            :dedent: 0
 
-            database = client.get_database('fabrikamdb')
-            try:
-                container = database.get_container('customers')
-            except HTTPFailure as failure:
-                if failure.status_code == 404:
-                    print('Container does not exist.')
-                else:
-                    print(f'Failed to retrieve container. Status code:{failure.status_code}')
         """
         collection_link = getattr(
             container, "collection_link", f"{self.database_link}/colls/{container}"
@@ -280,16 +269,18 @@ class Database:
     def list_containers(
         self, query: "str" = None, parameters=None
     ) -> "Iterable[Container]":
-        """ List the containers in this database.
+        """ List the containers in the database.
 
         :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
         :param parameters: Parameters for the query. Only applicable if a query has been specified.
 
         **Example**: List all containers in a database.
 
-        .. code-block:: python
-
-            database.list_containers()
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START list_containers]
+            :end-before: [END list_containers]
+            :language: python
+            :dedent: 0
 
         """
         if query:
@@ -320,6 +311,13 @@ class Database:
         conflict_resolution_policy=None,
     ):
         """ Update the properties of the container. Property changes are persisted immediately.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START set_container_properties]
+            :end-before: [END set_container_properties]
+            :language: python
+            :dedent: 0
+
         """
         container_id = getattr(container, "id", container)
         parameters = {
@@ -427,6 +425,15 @@ class Container:
 
         :param str id: ID of item to retrieve.
         :returns: :class:`Item`, if present in the container.
+
+        **Example**: Get an item from the database and update one of its properties.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START update_item]
+            :end-before: [END update_item]
+            :language: python
+            :dedent: 0
+
         """
         doc_link = f"{self.collection_link}/docs/{id}"
         result = self.client_context.ReadItem(document_link=doc_link)
@@ -467,16 +474,16 @@ class Container:
         :returns: An `Iterable` containing each :class:`Item` returned by the query, if any.
 
         You can use any value for the container name in the FROM clause, but typically the container name is used.
-        In the examples below, the container name is "Families," and is aliased as "f" for more succinct referencing
+        In the examples below, the container name is "products," and is aliased as "p" for easier referencing
         in the WHERE clause.
 
-        **Example:** Find all families in the state of NY.
+        **Example:** Get all products that haven't been discontinued.
 
-        .. code-block:: python
-
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = "NY"'
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START update_item]
+            :end-before: [END update_item]
+            :language: python
+            :dedent: 0
 
         **Example:** Parameterized query to find all families in the state of NY.
 
