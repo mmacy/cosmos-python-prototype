@@ -31,6 +31,9 @@ release = ''
 
 # -- General configuration ---------------------------------------------------
 
+# Both the class’ and the __init__ method’s docstring are concatenated and inserted.
+autoclass_content = 'both'
+
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'

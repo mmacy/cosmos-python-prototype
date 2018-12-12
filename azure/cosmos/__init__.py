@@ -48,14 +48,13 @@ class CosmosClient:
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
 
-        **Example**: Create a new client instance.
+        **Example:** Create a new instance of the Cosmos DB client.
 
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_client]
+            :end-before: [END create_client]
+            :language: python
+            :dedent: 0
 
         """
         self.client_context = ClientContext(
@@ -77,15 +76,13 @@ class CosmosClient:
         :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Create a new database.
+        **Example:** Create a database in the Cosmos DB account.
 
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
-            database = client.create_database('nameofdatabase')
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_database]
+            :end-before: [END create_database]
+            :language: python
+            :dedent: 0
 
         """
         try:
@@ -141,8 +138,9 @@ class Database:
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
 
-    A database also has associated users, each with a set of permissions to access various
-    other containers, stored procedures, triggers, user defined functions, or items
+    A database can also have associated users, each of which configured with
+    a set of permissions for accessing certain containers, stored procedures,
+    triggers, user defined functions, or items.
 
     :ivar id: The ID (name) of the database.
     :ivar properties: A dictionary of system-generated properties for this database. See below for the list of keys.
@@ -150,7 +148,7 @@ class Database:
     An Azure Cosmos DB SQL API database has the following system-generated properties; these properties are read-only:
 
     * `_rid`:   The resource ID.
-    * `_ts`:    Specifies the last updated timestamp of the resource. The value is a timestamp.
+    * `_ts`:    When the resource was last updated. The value is a timestamp.
     * `_self`:	The unique addressable URI for the resource.
     * `_etag`:	The resource etag required for optimistic concurrency control.
     * `_colls`:	The addressable path of the collections resource.
@@ -193,31 +191,27 @@ class Database:
 
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
-        :param id: ID of container to create.
+        :param id: ID (name) of container to create.
         :param partition_key: The partition key to use for the container.
         :param indexing_policy: The indexing policy to apply to the container.
-        :param default_ttl: Default TTL (time to live) for the container.
+        :param default_ttl: Default time to live (TTL) for items in the container. If unspecified, items do not expire.
         :raise HTTPFailure: The container creation failed.
 
-        **Example:** Create a container name 'mycontainer' with default settings:
+        **Example:** Create a container with default settings.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container]
+            :end-before: [END create_container]
+            :language: python
+            :dedent: 0
 
-            container = database.create_container('mycontainer')
+        **Example:** Create a container with specific settings; in this case, a custom partition key.
 
-        **Example:** Create a container named 'containerwithspecificsettings' with a custom partition key.
-
-        .. code-block:: python
-
-            container = database.create_container(
-                id='containerwithspecificsettings',
-                partition_key={
-                    "paths": [
-                    "/AccountNumber"
-                    ],
-                    "kind": "Hash"
-                }
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container_with_settings]
+            :end-before: [END create_container_with_settings]
+            :language: python
+            :dedent: 0
 
         """
         definition = dict(id=id)
@@ -250,21 +244,17 @@ class Database:
         self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
-        """ Get the container with the ID (name) `container`.
+        """ Get the specified `Container`, or a container with specified ID (name).
 
         :param container: The ID (name) of the container, or a :class:`Container` instance.
         :raise `HTTPFailure`: Raised if the container couldn't be retrieved. This includes if the container does not exist.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START get_container]
+            :end-before: [END get_container]
+            :language: python
+            :dedent: 0
 
-            database = client.get_database('fabrikamdb')
-            try:
-                container = database.get_container('customers')
-            except HTTPFailure as failure:
-                if failure.status_code == 404:
-                    print('Container does not exist.')
-                else:
-                    print(f'Failed to retrieve container. Status code:{failure.status_code}')
         """
         collection_link = getattr(
             container, "collection_link", f"{self.database_link}/colls/{container}"
@@ -280,16 +270,18 @@ class Database:
     def list_containers(
         self, query: "str" = None, parameters=None
     ) -> "Iterable[Container]":
-        """ List the containers in this database.
+        """ List the containers in the database.
 
         :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
         :param parameters: Parameters for the query. Only applicable if a query has been specified.
 
-        **Example**: List all containers in a database.
+        **Example:** List all containers in the database.
 
-        .. code-block:: python
-
-            database.list_containers()
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START list_containers]
+            :end-before: [END list_containers]
+            :language: python
+            :dedent: 0
 
         """
         if query:
@@ -320,6 +312,13 @@ class Database:
         conflict_resolution_policy=None,
     ):
         """ Update the properties of the container. Property changes are persisted immediately.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START set_container_properties]
+            :end-before: [END set_container_properties]
+            :language: python
+            :dedent: 0
+
         """
         container_id = getattr(container, "id", container)
         parameters = {
@@ -350,11 +349,13 @@ class Database:
 
         The user ID must be unique within the database, and consist of no more than 255 characters.
 
-        .. code-block:: python
+        **Example:** Create a database user.
 
-            database.create_user(dict(
-                id='Walter Harp'
-                ))
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_user]
+            :end-before: [END create_user]
+            :language: python
+            :dedent: 0
 
         """
         database = cast("Database", self)
@@ -427,6 +428,15 @@ class Container:
 
         :param str id: ID of item to retrieve.
         :returns: :class:`Item`, if present in the container.
+
+        **Example:** Get an item from the database and update one of its properties.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START update_item]
+            :end-before: [END update_item]
+            :language: python
+            :dedent: 0
+
         """
         doc_link = f"{self.collection_link}/docs/{id}"
         result = self.client_context.ReadItem(document_link=doc_link)
@@ -467,27 +477,24 @@ class Container:
         :returns: An `Iterable` containing each :class:`Item` returned by the query, if any.
 
         You can use any value for the container name in the FROM clause, but typically the container name is used.
-        In the examples below, the container name is "Families," and is aliased as "f" for more succinct referencing
+        In the examples below, the container name is "products," and is aliased as "p" for easier referencing
         in the WHERE clause.
 
-        **Example:** Find all families in the state of NY.
+        **Example:** Get all products that have not been discontinued.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START query_items]
+            :end-before: [END query_items]
+            :language: python
+            :dedent: 0
 
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = "NY"'
-            )
+        **Example:** Parameterized query to get all products that have been discontinued.
 
-        **Example:** Parameterized query to find all families in the state of NY.
-
-        .. code-block:: python
-
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = @addressState',
-                parameters=[
-                    dict(name='@addressState', value='NY')
-                ]
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START query_items_param]
+            :end-before: [END query_items_param]
+            :language: python
+            :dedent: 0
 
         """
         items = self.client_context.QueryItems(
