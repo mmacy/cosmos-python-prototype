@@ -44,17 +44,16 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
-
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
-
-        **Example:** Create a new instance of the Cosmos DB client.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_client]
             :end-before: [END create_client]
             :language: python
             :dedent: 0
+            :caption: Create a new instance of the Cosmos DB client:
+            :name: create_client
 
         """
         self.client_context = ClientContext(
@@ -76,13 +75,13 @@ class CosmosClient:
         :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example:** Create a database in the Cosmos DB account.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_database]
             :end-before: [END create_database]
             :language: python
             :dedent: 0
+            :caption: Create a database in the Cosmos DB account:
+            :name: create_database
 
         """
         try:
@@ -197,21 +196,21 @@ class Database:
         :param default_ttl: Default time to live (TTL) for items in the container. If unspecified, items do not expire.
         :raise HTTPFailure: The container creation failed.
 
-        **Example:** Create a container with default settings.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_container]
             :end-before: [END create_container]
             :language: python
             :dedent: 0
-
-        **Example:** Create a container with specific settings; in this case, a custom partition key.
+            :caption: Create a container with default settings:
+            :name: create_container
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_container_with_settings]
             :end-before: [END create_container_with_settings]
             :language: python
             :dedent: 0
+            :caption: Create a container with specific settings; in this case, a custom partition key:
+            :name: create_container_with_settings
 
         """
         definition = dict(id=id)
@@ -254,6 +253,8 @@ class Database:
             :end-before: [END get_container]
             :language: python
             :dedent: 0
+            :caption: Get an existing container, handling a failure if encountered:
+            :name: get_container
 
         """
         collection_link = getattr(
@@ -275,13 +276,13 @@ class Database:
         :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
         :param parameters: Parameters for the query. Only applicable if a query has been specified.
 
-        **Example:** List all containers in the database.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START list_containers]
             :end-before: [END list_containers]
             :language: python
             :dedent: 0
+            :caption: List all containers in the database:
+            :name: list_containers
 
         """
         if query:
@@ -318,6 +319,8 @@ class Database:
             :end-before: [END set_container_properties]
             :language: python
             :dedent: 0
+            :caption: Set the TTL property on a container, and display the updated properties:
+            :name: set_container_properties
 
         """
         container_id = getattr(container, "id", container)
@@ -349,13 +352,13 @@ class Database:
 
         The user ID must be unique within the database, and consist of no more than 255 characters.
 
-        **Example:** Create a database user.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_user]
             :end-before: [END create_user]
             :language: python
             :dedent: 0
+            :caption: Create a database user:
+            :name: create_user
 
         """
         database = cast("Database", self)
@@ -400,6 +403,11 @@ class Container:
 
     :ivar id: ID (name) of the container
     :session_token: The session token for the container.
+
+    .. note::
+
+        To create a new container in an existing database, use :func:`Database.create_container`.
+
     """
 
     def __init__(
@@ -429,13 +437,13 @@ class Container:
         :param str id: ID of item to retrieve.
         :returns: :class:`Item`, if present in the container.
 
-        **Example:** Get an item from the database and update one of its properties.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START update_item]
             :end-before: [END update_item]
             :language: python
             :dedent: 0
+            :caption: Get an item from the database and update one of its properties:
+            :name: update_item
 
         """
         doc_link = f"{self.collection_link}/docs/{id}"
@@ -480,21 +488,21 @@ class Container:
         In the examples below, the container name is "products," and is aliased as "p" for easier referencing
         in the WHERE clause.
 
-        **Example:** Get all products that have not been discontinued.
-
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START query_items]
             :end-before: [END query_items]
             :language: python
             :dedent: 0
-
-        **Example:** Parameterized query to get all products that have been discontinued.
+            :caption: Get all products that have not been discontinued:
+            :name: query_items
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START query_items_param]
             :end-before: [END query_items_param]
             :language: python
             :dedent: 0
+            :caption: Parameterized query to get all products that have been discontinued:
+            :name: query_items_param
 
         """
         items = self.client_context.QueryItems(
@@ -511,7 +519,7 @@ class Container:
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
         """ Replaces the specified item if it exists in the container.
 
-        :param body: A dict-like object or string representing the item to replace.
+        :param body: A dict-like object representing the item to replace.
         :raises `HTTPFailure`:
         """
         item_link = Container._document_link(item)
@@ -523,7 +531,7 @@ class Container:
     def upsert_item(self, body: "Dict[str, Any]") -> "Item":
         """ Insert or update the specified item.
 
-        :param body: A dict-like object or string representing the item to update or insert.
+        :param body: A dict-like object representing the item to update or insert.
         :raises `HTTPFailure`:
 
         If the item already exists in the container, it is replaced. If it does not, it is inserted.
@@ -537,7 +545,7 @@ class Container:
     def create_item(self, body: "Dict[str, Any]") -> "Item":
         """ Create an item in the container.
 
-        :param body: A dict-like object or string representing the item to create.
+        :param body: A dict-like object representing the item to create.
         :returns: The :class:`Item` inserted into the container.
         :raises `HTTPFailure`:
 
