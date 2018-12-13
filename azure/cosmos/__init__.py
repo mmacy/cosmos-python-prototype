@@ -1,11 +1,7 @@
-"""
-Create, read, update, and delete databases, containers, and items in Azure Cosmos DB SQL API databases.
-"""
+"""Create, read, update, and delete databases, containers, and items in Azure Cosmos DB SQL API databases."""
 
 __all__ = ["CosmosClient", "Database", "Container", "Item"]
 
-
-from internal.cosmos.errors import HTTPFailure
 
 from typing import (
     Any,
@@ -36,13 +32,14 @@ class User:
 class CosmosClient:
     """
     Provides a client-side logical representation of an Azure Cosmos DB account.
+
     Use this client to configure and execute requests to the Azure Cosmos DB service.
     """
 
     def __init__(
         self, url: "str", key, consistency_level="Session", connection_policy=None
     ):
-        """ Instantiate a new CosmosClient.
+        """Instantiate a new CosmosClient.
 
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
@@ -68,7 +65,7 @@ class CosmosClient:
         return getattr(database_or_id, "database_link", f"dbs/{database_or_id}")
 
     def create_database(self, id: "str", fail_if_exists: "bool" = False) -> "Database":
-        """ Create a new database with the given ID (name).
+        """Create a new database with the given ID (name).
 
         :param id: ID (name) of the database to create.
         :param fail_if_exists: Fail if database already exists.
@@ -93,8 +90,7 @@ class CosmosClient:
         return self.get_database(id)
 
     def get_database(self, database: "Union[str, Database]") -> "Database":
-        """
-        Retrieve an existing database with the ID (name) `id`.
+        """Retrieve an existing database with the ID (name) `id`.
 
         :param id: ID of the new :class:`Database`.
         :raise `HTTPFailure`: If the given database couldn't be retrieved.
@@ -104,8 +100,7 @@ class CosmosClient:
         return Database(self.client_context, properties["id"], properties)
 
     def list_databases(self, query: "Optional[str]" = None) -> "Iterable[Database]":
-        """
-        List the databases in a Cosmos DB SQL database account.
+        """List the databases in a Cosmos DB SQL database account.
 
         :param query: Cosmos DB SQL query. If omitted, all databases in the account are listed.
         """
@@ -121,8 +116,7 @@ class CosmosClient:
             ]
 
     def delete_database(self, database: "Union[Database, str]"):
-        """
-        Delete the database with the given ID (name).
+        """Delete the database with the given ID (name).
 
         :param database: The ID (name) or :class:`Database` instance of the database to delete.
         :raise HTTPFailure: If the database couldn't be deleted.
@@ -132,7 +126,7 @@ class CosmosClient:
 
 
 class Database:
-    """ Represents an Azure Cosmos DB SQL API database.
+    """Represents an Azure Cosmos DB SQL API database.
 
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
@@ -160,7 +154,8 @@ class Database:
         id: "str",
         properties: "Optional[Dict[str, Any]]" = None,
     ):
-        """
+        """Instantiate a new Database.
+
         :param ClientSession client_context: Client from which this database was retrieved.
         :param str id: ID (name) of the database.
         """
@@ -185,8 +180,7 @@ class Database:
         indexing_policy: "Optional[Dict[str, Any]]" = None,
         default_ttl: "int" = None,
     ) -> "Container":
-        """
-        Create a new container with the given ID (name).
+        """Create a new container with the given ID (name).
 
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
@@ -235,18 +229,18 @@ class Database:
         ...
 
     def delete_container(self, container: "Union[str, Container]"):
-        """ Delete the container
+        """Delete the container.
 
-        :param container: The ID (name) of the container to delete. You can either pass in the ID of the container to delete, or :class:`Container` instance.
+        :param container: The ID (name) of the container to delete. You can pass in the ID of the container to delete or a :class:`Container` instance.
         """
         collection_link = self._get_container_link(container)
         self.client_context.DeleteContainer(collection_link)
 
     def get_container(self, container: "Union[str, Container]") -> "Container":
-        """ Get the specified `Container`, or a container with specified ID (name).
+        """Get the specified `Container`, or a container with specified ID (name).
 
         :param container: The ID (name) of the container, or a :class:`Container` instance.
-        :raise `HTTPFailure`: Raised if the container couldn't be retrieved. This includes if the container does not exist.
+        :raise `HTTPFailure`: Raised if the container couldn't be retrieved, including if the container doesn't exist.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START get_container]
@@ -271,7 +265,7 @@ class Database:
     def list_containers(
         self, query: "str" = None, parameters=None
     ) -> "Iterable[Container]":
-        """ List the containers in the database.
+        """List the containers in the database.
 
         :param query: The SQL query used for filtering the list of containers. If omitted, all containers in the database are returned.
         :param parameters: Parameters for the query. Only applicable if a query has been specified.
@@ -312,7 +306,7 @@ class Database:
         default_ttl=None,
         conflict_resolution_policy=None,
     ):
-        """ Update the properties of the container. Property changes are persisted immediately.
+        """Update the properties of the container. Property changes are persisted immediately.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START set_container_properties]
@@ -334,19 +328,20 @@ class Database:
                 "conflictResolutionPolicy": conflict_resolution_policy,
             }.items()
             if value
-            is not None  # TODO: Questionable use - should use kwargs instead. Need to figure out best documentation for kwargs...
+            is not None  # TODO: Questionable use, should use kwargs instead. Determine best documentation for kwargs.
         }
         collection_link = f"{self.database_link}/colls/{container_id}"
         self.client_context.ReplaceContainer(collection_link, collection=parameters)
 
     def get_user_link(self, id_or_user: "Union[User, str]") -> "str":
+        """Get the user_link attribute for the specified user."""
         user_link = getattr(
             id_or_user, "user_link", f"{self.database_link}/users/{id_or_user}"
         )
         return user_link
 
     def create_user(self, user, options=None):
-        """ Create a new user in the database.
+        """Create a new user in the database.
 
         :param user: A dict-like object with an `id` key and value.
 
@@ -365,7 +360,7 @@ class Database:
         return database.client_context.CreateUser(database.database_link, user, options)
 
     def get_user(self, id):
-        """ Get the specified user from the database.
+        """Get the specified user from the database.
 
         :param id: The ID of the user to retrieve.
         """
@@ -373,33 +368,34 @@ class Database:
         return database.client_context.ReadUser(self.get_user_link(id))
 
     def list_users(self, query=None):
-        """ Get all database users.
-        """
+        """Get all database users."""
         database = cast("Database", self)
         yield from [User(user) for user in database.client_context.ReadUsers(query)]
 
     def delete_user(self, user):
-        """ Delete the specified user from the database.
-        """
+        """Delete the specified user from the database."""
         database = cast("Database", self)
         database.client_context.DeleteUser(self.get_user_link(id))
 
 
 class Item(dict):
-    """ Represents a document in an Azure Cosmos DB SQL API container.
+    """Represents a document in an Azure Cosmos DB SQL API container.
 
     To create, read, update, and delete Items, use the associated methods on the :class:`Container`.
     """
+
     def __init__(self, headers: "Dict[str, Any]", data: "Dict[str, Any]"):
+        """Instantiate a new Item instance."""
         super().__init__()
         self.response_headers = headers
         self.update(data)
 
 
 class Container:
-    """ An Azure Cosmos DB container.
+    """An Azure Cosmos DB container.
 
-    A container in an Azure Cosmos DB SQL API database is a collection of documents, each of which represented as an :class:`Item`.
+    A container in an Azure Cosmos DB SQL API database is a collection of documents, each of which represented as
+    an :class:`Item`.
 
     :ivar id: ID (name) of the container
     :session_token: The session token for the container.
@@ -417,6 +413,7 @@ class Container:
         id: "str",
         properties: "Optional[Dict[str, Any]]" = None,
     ):
+        """Instantiate a new Container instance."""
         self.client_context = client_context
         self.session_token = None
         self.id = id
@@ -431,8 +428,7 @@ class Container:
         return cast("str", cast("Item", item_or_link)["_self"])
 
     def get_item(self, id: "str") -> "Item":
-        """
-        Get the item identified by `id`.
+        """Get the item identified by `id`.
 
         :param str id: ID of item to retrieve.
         :returns: :class:`Item`, if present in the container.
@@ -453,8 +449,7 @@ class Container:
         return Item(headers=headers, data=result)
 
     def list_items(self, options=None) -> "Iterable[Item]":
-        """ List all items in the container.
-        """
+        """List all items in the container."""
         options = options or {}
         items = self.client_context.ReadItems(
             collection_link=self.collection_link, feed_options=options
@@ -463,8 +458,7 @@ class Container:
         yield from [Item(headers=headers, data=item) for item in items]
 
     def query_items_change_feed(self, options=None):
-        """ Get a sorted list of items that were changed, in the order in which they were modified.
-        """
+        """Get a sorted list of items that were changed, in the order in which they were modified."""
         items = self.client_context.QueryItemsChangeFeed(
             self.collection_link, options=options
         )
@@ -517,7 +511,7 @@ class Container:
         yield from [Item(headers, item) for item in items]
 
     def replace_item(self, item: "Union[Item, str]", body: "Dict[str, Any]") -> "Item":
-        """ Replaces the specified item if it exists in the container.
+        """Replace the specified item if it exists in the container.
 
         :param body: A dict-like object representing the item to replace.
         :raises `HTTPFailure`:
@@ -529,21 +523,20 @@ class Container:
         return Item(headers=self.client_context.last_response_headers, data=data)
 
     def upsert_item(self, body: "Dict[str, Any]") -> "Item":
-        """ Insert or update the specified item.
+        """Insert or update the specified item.
 
         :param body: A dict-like object representing the item to update or insert.
         :raises `HTTPFailure`:
 
         If the item already exists in the container, it is replaced. If it does not, it is inserted.
         """
-
         result = self.client_context.UpsertItem(
             database_or_Container_link=self.collection_link, document=body
         )
         return Item(headers=self.client_context.last_response_headers, data=result)
 
     def create_item(self, body: "Dict[str, Any]") -> "Item":
-        """ Create an item in the container.
+        """Create an item in the container.
 
         :param body: A dict-like object representing the item to create.
         :returns: The :class:`Item` inserted into the container.
@@ -558,10 +551,10 @@ class Container:
         return Item(headers=self.client_context.last_response_headers, data=result)
 
     def delete_item(self, item: "Item") -> "None":
-        """ Delete the specified item from the container.
+        """Delete the specified item from the container.
 
         :param item: The :class:`Item` to delete from the container.
-        :raises `HTTPFailure`: The item wasn't deleted successfully. If the item does not exist in the container, a `404` error is returned.
+        :raises `HTTPFailure`: The item wasn't deleted successfully. If the item doesn't exist in the container, a `404` error is returned.
 
         """
         document_link = Container._document_link(item)
