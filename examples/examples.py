@@ -112,6 +112,15 @@ for item in discontinued_items:
     print(json.dumps(item, indent=True))
 # [END query_items_param]
 
+# Delete items from the container.
+# The Cosmos DB SQL API does not support 'DELETE' queries,
+# so deletes must be done with the delete_item method
+# on the container.
+# [START delete_items]
+for item in container.query_items(query='SELECT * FROM products p WHERE p.productModel = "DISCONTINUED"'):
+    container.delete_item(item)
+# [END delete_items]
+
 # Retrieve the properties of a database
 # [START get_database_properties]
 properties = database.properties

@@ -123,7 +123,7 @@ container = database.get_container(container_name)
 
 ### Insert data
 
-To insert items into a container, pass a dictionary or JSON string containing your data to `Container.upsert_item`.
+To insert items into a container, pass a dictionary containing your data to `Container.upsert_item`.
 
 This example inserts several items into the container, each with a unique ID. If you don't include an `id` field in the items you insert, Cosmos DB generates an ID for you in the form of a GUID.
 
