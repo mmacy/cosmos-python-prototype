@@ -1,4 +1,4 @@
-# README.md
+# README.md template
 
 SDK READMEs can vary in content, coverage, and length, but should include these sections:
 
