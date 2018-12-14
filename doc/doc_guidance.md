@@ -13,7 +13,7 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 | Type | Description | Owner | Example |
 | -- | -- | -- | -- |
 | [README](#readme) | `README.md` file in the root of the SDK repository. Ingested by docs.microsoft.com and displayed as the SDK's "landing page."  | SDK author (product/SDK team)| [Cosmos DB Python SDK README](../README.md) |
-| [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB `cosmos` package][docs_api_ref_cosmosdb] |
+| [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
 | [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
 
 ## README
@@ -89,7 +89,7 @@ The Open Publishing System (OPS) [Onboarding & Admin Guide][ops_guide] contains 
 [azure_docs_private]: https://github.com/MicrosoftDocs/azure-docs-pr
 [azure_docs_public]: https://github.com/MicrosoftDocs/azure-docs
 [azure_docs]: https://docs.microsoft.com/azure/index
-[docs_api_ref_cosmosdb]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos
+[docs_api_ref_cosmosdb]: http://cosmosproto.westus.azurecontainer.io/
 [docs_api_ref_python]: https://docs.microsoft.com/python/api/overview/azure/?view=azure-python
 [docs_contrib]: https://review.docs.microsoft.com/help/contribute/index?branch=master
 [ops_guide]: https://review.docs.microsoft.com/help/onboard/?branch=master
