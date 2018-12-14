@@ -9,8 +9,8 @@ class QueryResultIterator(collections.abc.Iterator):
     functions, or it may be a dictionary for projections.
     """
 
-    def __init__(self, inner, headers=None):
-        self.headers = headers
+    def __init__(self, inner, metadata=None):
+        self.response_metadata = metadata
         self._inner = inner
 
     def __next__(self):

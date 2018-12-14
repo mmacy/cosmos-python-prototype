@@ -2,8 +2,8 @@ import os
 
 from azure.cosmos import CosmosClient, HTTPFailure
 
-AUTH_URI = os.environ.get("ACCOUNT_URI")
-AUTH_KEY = os.environ.get("ACCOUNT_KEY")
+AUTH_URI = os.environ["ACCOUNT_URI"]
+AUTH_KEY = os.environ["ACCOUNT_KEY"]
 TEST_DB_NAME = "testdatabasemanagementdb"
 
 
@@ -11,17 +11,10 @@ class DatabaseManagement:
     @staticmethod
     def find_database(client, id):
         print("1. Query for database")
-        databases = list(
-            client.list_databases(
-                query=dict(
-                    query="SELECT * FROM r WHERE r.id=@id",
-                    parameters=[dict(name="@id", value=id)],
-                )
-            )
-        )
-        if databases:
-            print(f"Database with id {id} was found")
-        else:
+        try:
+            database = client.get_database(id)
+            print(f"Database with id {database.id} was found")
+        except HTTPFailure:
             print(f"Database with id {id} was not found")
 
     @staticmethod
@@ -29,7 +22,7 @@ class DatabaseManagement:
         print("2. Create database")
         try:
             database = client.create_database(id, fail_if_exists=True)
-            print(f"A database with id {id} created")
+            print(f"A database with id {database.id} created")
         except HTTPFailure as e:
             if e.status_code == 409:
                 print(f"A database with id {id} already exists")
