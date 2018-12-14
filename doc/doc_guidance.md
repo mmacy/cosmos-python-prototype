@@ -1,14 +1,14 @@
-# Documenting your SDK
+# Document your SDK
 
 Documentation is important. Often cited by customers as one of their top criterion when evaluating an SDK, complete and current documentation can enable a successful customer that builds a product using your service and espouses the merits of your SDK to colleagues and others.
 
 Or, if your documentation is incomplete or out of date, it can hinder their progress, prevent adoption of your SDK and service, and result in negative public reviews.
 
-Avoid the latter by following a these guiding principles.
+Provide clear, complete, and up-to-date documentation for your SDK to make your customers happy and drive adoption.
 
 ## Documentation deliverables
 
-There are three primary types of documentation for an Azure SDK. Two are the responsibility of the Azure SDK and product teams, the third lies with content developers (the "docs team"), product PMs, and even the public.
+There are three primary types of documentation for an Azure SDK. Two are the responsibility of the Azure SDK and product teams, the third lies with content developers (the "docs team"), product PMs, and even the public. However, we build the experience and ensure its quality **as one team**.
 
 | Type | Description | Owner | Example |
 | -- | -- | -- | -- |
@@ -74,20 +74,31 @@ See the [Docs Contributor Guide][docs_contrib] for details on contributing conce
 
 ## Next steps
 
-The Open Publishing System (OPS) documentation contains extensive details on providing documentation for your SDK. Here are a few links you might find valuable:
+The Open Publishing System (OPS) [Onboarding & Admin Guide][ops_guide] contains extensive details about the docs.microsoft.com publishing pipeline. The following links contain information you might find valuable while you document your SDK.
 
-
+* [Supported platforms][ops_platforms] - Publishing system toolchain information, including a matrix of the language-native documentation tools used in reference generation (Sphinx for Python, TypeDoc for TypeScript, etc.)
+* Documenting code
+  * .NET: [Preparing your .NET code for doc generation][ops_how_dotnet]
+  * Java: [How to Document Java APIs][ops_how_java]
+  * JavaScript/TypeScript: [Documenting JavaScript & TypeScript APIs][ops_how_javascript]
+  * Python: [How to document a Python API][ops_how_python]
 
 <!-- LINKS -->
 
-[azure_docs]: https://docs.microsoft.com/azure/index
 [azure_docs_cosmos]: https://docs.microsoft.com/azure/cosmos-db/
 [azure_docs_private]: https://github.com/MicrosoftDocs/azure-docs-pr
 [azure_docs_public]: https://github.com/MicrosoftDocs/azure-docs
-[docs_api_ref_python]: https://docs.microsoft.com/python/api/overview/azure/?view=azure-python
+[azure_docs]: https://docs.microsoft.com/azure/index
 [docs_api_ref_cosmosdb]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos
+[docs_api_ref_python]: https://docs.microsoft.com/python/api/overview/azure/?view=azure-python
 [docs_contrib]: https://review.docs.microsoft.com/help/contribute/index?branch=master
+[ops_guide]: https://review.docs.microsoft.com/help/onboard/?branch=master
+[ops_how_dotnet]: https://review.docs.microsoft.com/help/onboard/admin/reference/dotnet/documenting-api?branch=master
+[ops_how_java]: https://review.docs.microsoft.com/help/onboard/admin/reference/java/documenting-api?branch=master
+[ops_how_javascript]: https://review.docs.microsoft.com/help/onboard/admin/reference/js-ts/documenting-api?branch=master
+[ops_how_python]: https://review.docs.microsoft.com/help/onboard/admin/reference/python/documenting-api?branch=master
+[ops_platforms]: https://review.docs.microsoft.com/help/onboard/admin/reference/concepts/platforms?branch=master
 [sphinx_literalinclude]: https://www.sphinx-doc.org/en/1.5/markup/code.html?highlight=code%20examples#includes
+[tool_docformatter]: https://github.com/PyCQA/pydocstyle
 [tool_flake8docstrings]: https://pypi.org/project/flake8-docstrings/
 [tool_pydocstyle]: https://pypi.org/project/docformatter/
-[tool_docformatter]: https://github.com/PyCQA/pydocstyle
