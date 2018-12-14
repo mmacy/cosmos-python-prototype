@@ -20,7 +20,7 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 
 The `README.md` is the entry point for your SDK. It's the welcome mat and front door, and should provide the quickest, easiest path for getting up and running with your SDK. It should be as brief as possible but as complete as necessary, enabling SDK users to perform the most common operations with the least amount of friction.
 
-Include these sections in your README:
+Include these sections in your README. For a more detailed discussion of each, see the [Azure SDK README template](doc_readme_template.md).
 
 | Section | Description |
 | ------- | ----------- |
@@ -32,8 +32,6 @@ Include these sections in your README:
 | Examples | Code snippets and their descriptions for those operations that most customers will use. Include examples for operations that are complex or otherwise tricky to use. |
 | Troubleshooting | Describe common errors and exceptions, how to "unpack" them (if necessary), and include guidance for graceful handling and recovery. |
 | Next steps | Provide pointers to related SDKs, documentation, or otherwise helpful content in other locations. |
-
-For a more detailed discussion of each, see the [Azure SDK README template](doc_readme_template.md).
 
 > TIP: See the Cosmos DB Python SDK [README.md](../README.md) for an example of a README that follows this guidance.
 
