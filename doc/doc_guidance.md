@@ -18,7 +18,7 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 
 ## README
 
-The `README.md` is the entry point for your SDK. It's the welcome mat and front door, and should provide the quickest, easiest path for getting up and running with your SDK. It should be as brief as possible but as complete as necessary, enabling SDK users to perform the most common operations with the least amount of friction.
+The `README.md` is the entry point to your SDK. It's the welcome mat and front door, and should provide the quickest, easiest path for getting up and running with your SDK. It should be as brief as possible but as complete as necessary, enabling SDK users to perform the most common operations with the least amount of friction.
 
 Include these sections in your README. For a more detailed discussion of each, see the [Azure SDK README template](doc_readme_template.md).
 
@@ -52,9 +52,10 @@ Follow the documentation best practices for the language in which your SDK is wr
   * "What errors/exceptions are commonly encountered when using this method?"
   * "How do I gracefully handle and recover from this exception? Best ways for preventing it from occurring in the first place?"
 * **Crosslink** between your reference docs, the README, and conceptual docs.
-  * Provide links to types/members in the reference documentation from the README and conceptual docs, and vice-versa
+  * Provide links to types/members in the reference documentation from the README and conceptual docs, and vice-versa.
+* Code documentation **validation tools** are available for most languages to help validate your in-code documentation--use them! For example, Python docstrings can be validated with [flake8-docstrings][tool_flake8docstrings], [pydocstyle][tool_pydocstyle], and [docformatter][tool_docformatter].
 
-> TIP: Doc validation tools are available for most languages to help validate your in-code documentation. For example, Python docstrings can be validated with [flake8-docstrings][tool_flake8docstrings], [pydocstyle][tool_pydocstyle], and [docformatter][tool_docformatter].
+> TIP: See the Cosmos DB Python SDK [API reference][docs_api_ref_cosmosdb] for an example of SDK reference documentation that follows this guidance.
 
 ## Conceptual
 
