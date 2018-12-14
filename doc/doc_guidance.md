@@ -25,13 +25,13 @@ Include these sections in your README:
 | Section | Description |
 | ------- | ----------- |
 | Introduction | Appears directly under the title (H1) of your README. **Do not** use an "Introduction" or "Overview" heading (H2) for this section. |
-| Prerequisites | Specifies all requirements a customer must satisfy in order to use your SDK effectively. Subscriptions, accounts, packages, versions, etc. |
+| Prerequisites | Specify all requirements a customer must satisfy in order to use your SDK effectively. Subscriptions, accounts, packages, versions, etc. |
 | Installation | Step-by-step instructions for obtaining and installing the SDK. |
 | Authentication | Instructions and example code needed for initializing and authenticating the SDK client with Azure. |
-| Usage | Points out the most important and useful classes in the SDK, and briefly explains how those classes work together. |
+| Usage | Point out the most important and useful classes in the SDK, and briefly explain how those classes work together. |
 | Examples | Code snippets and their descriptions for those operations that most customers will use. Include examples for operations that are complex or otherwise tricky to use. |
-| Troubleshooting | Describes common errors and exceptions, how to "unpack" them (if necessary), and includes guidance for graceful handling and recovery. |
-| Next steps | Provides pointers to related SDKs, documentation, or otherwise helpful content in other locations. |
+| Troubleshooting | Describe common errors and exceptions, how to "unpack" them (if necessary), and include guidance for graceful handling and recovery. |
+| Next steps | Provide pointers to related SDKs, documentation, or otherwise helpful content in other locations. |
 
 For a more detailed discussion of each, see the [Azure SDK README template](doc_readme_template.md).
 
