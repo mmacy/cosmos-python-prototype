@@ -39,7 +39,7 @@ For a more detailed discussion of each, see the [Azure SDK README template](doc_
 
 ## Reference
 
-Reference documentation is generated from the documentation of the types and their members in your code. For example, docstrings in Python and triple-slash (`///`) comments in C#. It enables the generation of the [API reference][docs_api_ref_python] that appears on docs.microsoft.com, and IntelliSense-like hover help in IDEs.
+Reference documentation is generated from the documentation in your code. For example, docstrings in Python and triple-slash (`///`) comments in C#. It enables the generation of the [API reference][docs_api_ref_python] that appears on docs.microsoft.com, and IntelliSense-like hover help in IDEs.
 
 Follow the documentation best practices for the language in which your SDK is written. At a minimum, include the following:
 
@@ -74,7 +74,9 @@ See the [Docs Contributor Guide][docs_contrib] for details on contributing conce
 
 ## Next steps
 
-The Open Publishing System (OPS) documentation contains
+The Open Publishing System (OPS) documentation contains extensive details on providing documentation for your SDK. Here are a few links you might find valuable:
+
+
 
 <!-- LINKS -->
 
