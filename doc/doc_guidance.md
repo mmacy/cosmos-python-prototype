@@ -12,9 +12,11 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 
 | Type | Description | Owner | Example |
 | -- | -- | -- | -- |
-| [README](#readme) | `README.md` file in the root of the SDK repository. Ingested by docs.microsoft.com and displayed as the SDK's "landing page."  | SDK author (product/SDK team)| [Cosmos DB Python SDK README](../README.md) |
+| [README](#readme) | `README.md` file in the root of the SDK repository. Ingested by docs.microsoft.com and displayed as the SDK's "landing page." See NOTE below.  | SDK author (product/SDK team)| [Cosmos DB Python SDK README](../README.md) |
 | [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
 | [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
+
+> NOTE: The README is not yet ingested by docs.microsoft.com as the reference landing page. **This feature is planned**.
 
 ## README
 

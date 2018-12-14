@@ -36,7 +36,9 @@ Specify all requirements a customer must satisfy in order to use the examples in
 
 ## Installation
 
-Provide step-by-step instructions for obtaining and installing the SDK. Whether it's NuGet, pip, npm, or cloning a GitHub repository, include any information specific to setting an environment for working with the SDK. Customers should be able to [authenticate](#authentication) and test all of the snippets in the [Examples](#examples) section after following the steps or referring to the links in this section.
+Provide step-by-step instructions for obtaining and installing the SDK. Whether it's NuGet, pip, npm, or cloning a GitHub repository, include any information specific to setting an environment for working with the SDK.
+
+Customers should be able to [authenticate](#authentication) and test all of the snippets in the [Examples](#examples) section after following the steps or referring to the links in this section.
 
 ## Authentication
 
@@ -48,11 +50,17 @@ The *Usage* section should describe the functionality of the main classes. It sh
 
 ## Examples
 
-Include code snippets and their descriptions for those operations that most customers will use. Include examples for operations that are complex or otherwise tricky to use. If possible, use the same snippets that your in-code documentation uses. For example, use the same snippets included in an `examples.py` file that Sphinx uses to ingest snippets via its [literalinclude](https://www.sphinx-doc.org/en/1.5/markup/code.html?highlight=code%20examples#includes) directive. These snippets should reside alongside your SDK code, and should be tested in an automated fashion.
+Include code snippets and their descriptions for those operations that most customers will use. Include examples for operations that are complex or otherwise tricky to use. If possible, use the same snippets that your in-code documentation uses.
+
+For example, use the same snippets you include in `examples.py` that Sphinx ingests via its [literalinclude](https://www.sphinx-doc.org/en/1.5/markup/code.html?highlight=code%20examples#includes) directive. The `examples.py` file containing the snippets should reside alongside your SDK code, and should be tested in an automated fashion.
 
 ## Troubleshooting
 
-Describe common errors and exceptions, how to "unpack" them (if necessary), and include guidance for graceful handling and recovery.
+Describe common errors and exceptions, how to "unpack" them if necessary, and include guidance for graceful handling and recovery.
+
+Provide information to help your SDK users avoid throttling or other service-enforced errors they might encounter. For example, provide guidance and examples for using retry or connection policies in the SDK.
+
+If the SDK supports it, include tips for logging or enabling instrumentation to help them debug their code.
 
 ## Next steps
 
