@@ -5,7 +5,7 @@
 
 # All interaction with Cosmos DB starts with an instance of the CosmosClient
 # [START create_client]
-from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
+from azure.cosmos import HTTPFailure, CosmosClient, Container, Database, PartitionKey
 
 import os
 
@@ -44,12 +44,8 @@ customer_container_name = 'customers'
 try:
     customer_container = database.create_container(
         id=customer_container_name,
-        partition_key={
-            "paths": [
-            "/AccountNumber"
-            ],
-            "kind": "Hash"
-        }
+        partition_key=PartitionKey(path="/productName"),
+        default_ttl=200,
     )
 except HTTPFailure as e:
     if e.status_code != 409:

@@ -21,7 +21,7 @@ class DatabaseManagement:
     def create_database(client, id):
         print("2. Create database")
         try:
-            database = client.create_database(id, fail_if_exists=True)
+            database = client.create_database(id)
             print(f"A database with id {database.id} created")
         except HTTPFailure as e:
             if e.status_code == 409:
