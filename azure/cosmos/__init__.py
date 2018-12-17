@@ -87,18 +87,16 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
-
         :param url: The URL of the Cosmos DB account.
         :param consistency_level: Consistency level to use for the session.
 
-        **Example**: Create a new client instance.
-
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_client]
+            :end-before: [END create_client]
+            :language: python
+            :dedent: 0
+            :caption: Create a new instance of the Cosmos DB client:
+            :name: create_client
 
         """
         self.client_context = ClientContext(
@@ -144,15 +142,13 @@ class CosmosClient:
         :returns: A :class:`Database` instance representing the new database.
         :raises `HTTPFailure`: If `fail_if_exists` is set to True and a database with the given ID already exists.
 
-        **Example**: Create a new database.
-
-        .. code-block:: python
-
-            import os
-            ACCOUNT_KEY = os.environ['ACCOUNT_KEY']
-            ACCOUNT_URI = os.environ['ACCOUNT_URI']
-            client = CosmosClient(url=ACCOUNT_URI, key=ACCOUNT_KEY)
-            database = client.create_database('nameofdatabase')
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_database]
+            :end-before: [END create_database]
+            :language: python
+            :dedent: 0
+            :caption: Create a database in the Cosmos DB account:
+            :name: create_database
 
         """
         result = self.client_context.CreateDatabase(database=dict(id=id))
@@ -338,8 +334,9 @@ class Database:
     A database contains one or more containers, each of which can contain items,
     stored procedures, triggers, and user-defined functions.
 
-    A database also has associated users, each with a set of permissions to access various
-    other containers, stored procedures, triggers, user defined functions, or items
+    A database can also have associated users, each of which configured with
+    a set of permissions for accessing certain containers, stored procedures,
+    triggers, user defined functions, or items.
 
     :ivar id: The ID (name) of the database.
     :ivar properties: A dictionary of system-generated properties for this database. See below for the list of keys.
@@ -347,7 +344,7 @@ class Database:
     An Azure Cosmos DB SQL API database has the following system-generated properties; these properties are read-only:
 
     * `_rid`:   The resource ID.
-    * `_ts`:    Specifies the last updated timestamp of the resource. The value is a timestamp.
+    * `_ts`:    When the resource was last updated. The value is a timestamp.
     * `_self`:	The unique addressable URI for the resource.
     * `_etag`:	The resource etag required for optimistic concurrency control.
     * `_colls`:	The addressable path of the collections resource.
@@ -400,10 +397,10 @@ class Database:
 
         If a container with the given ID already exists, an HTTPFailure with status_code 409 is raised.
 
-        :param id: ID of container to create.
+        :param id: ID (name) of container to create.
         :param partition_key: The partition key to use for the container.
         :param indexing_policy: The indexing policy to apply to the container.
-        :param default_ttl: Default TTL (time to live) for the container.
+        :param default_ttl: Default time to live (TTL) for items in the container. If unspecified, items do not expire.
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
@@ -411,20 +408,22 @@ class Database:
 
         :raise HTTPFailure: The container creation failed.
 
-        **Example:** Create a container name 'mycontainer' with default settings:
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container]
+            :end-before: [END create_container]
+            :language: python
+            :dedent: 0
+            :caption: Create a container with default settings:
+            :name: create_container
 
-            container = database.create_container('mycontainer')
-
-        **Example:** Create a container named 'containerwithspecificsettings' with a custom partition key.
-
-        .. code-block:: python
-
-            container = database.create_container(
-                id='containerwithspecificsettings',
-                partition_key=PartitionKey(path='/AccountNumber')
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_container_with_settings]
+            :end-before: [END create_container_with_settings]
+            :language: python
+            :dedent: 0
+            :caption: Create a container with specific settings; in this case, a custom partition key:
+            :name: create_container_with_settings
 
         """
         definition: "Dict[str, Any]" = dict(id=id)
@@ -500,7 +499,7 @@ class Database:
         initial_headers: "Optional[Dict[str, Any]]" = None,
         populate_query_metrics: "Optional[bool]" = None,
     ) -> "Container":
-        """ Get the container with the ID (name) `container`.
+        """ Get the specified `Container`, or a container with specified ID (name).
 
         :param container: The ID (name) of the container, or a :class:`Container` instance.
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
@@ -509,16 +508,14 @@ class Database:
         :raise `HTTPFailure`: Raised if the container couldn't be retrieved. This includes if the container does not exist.
         :returns: :class:`Container`, if present in the container.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START get_container]
+            :end-before: [END get_container]
+            :language: python
+            :dedent: 0
+            :caption: Get an existing container, handling a failure if encountered:
+            :name: get_container
 
-            database = client.get_database('fabrikamdb')
-            try:
-                container = database.get_container('customers')
-            except HTTPFailure as failure:
-                if failure.status_code == 404:
-                    print('Container does not exist.')
-                else:
-                    print(f'Failed to retrieve container. Status code:{failure.status_code}')
         """
         request_options: "Dict[str, Any]" = {}
         if disable_ru_per_minute_usage is not None:
@@ -551,7 +548,7 @@ class Database:
         initial_headers: "Optional[Dict[str, Any]]" = None,
         populate_query_metrics: "Optional[bool]" = None,
     ) -> "Iterable[Container]":
-        """ List the containers in this database.
+        """ List the containers in the database.
 
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param max_degree_parallelism: The maximum number of concurrent operations that run client side during parallel query execution in the Azure Cosmos DB database service. Negative values make the system automatically decides the number of concurrent operations to run.
@@ -559,11 +556,13 @@ class Database:
         :param session_token: Token for use with Session consistency.
         :param populate_query_metrics: Enable returning query metrics in response headers.
 
-        **Example**: List all containers in a database.
-
-        .. code-block:: python
-
-            database.list_containers()
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START list_containers]
+            :end-before: [END list_containers]
+            :language: python
+            :dedent: 0
+            :caption: List all containers in the database:
+            :name: list_containers
 
         """
         request_options: "Dict[str, Any]" = {}
@@ -654,6 +653,15 @@ class Database:
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
         :param populate_query_metrics: Enable returning query metrics in response headers.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START set_container_properties]
+            :end-before: [END set_container_properties]
+            :language: python
+            :dedent: 0
+            :caption: Set the TTL property on a container, and display the updated properties:
+            :name: set_container_properties
+
         """
         container_id = getattr(container, "id", container)
 
@@ -698,11 +706,13 @@ class Database:
 
         The user ID must be unique within the database, and consist of no more than 255 characters.
 
-        .. code-block:: python
-
-            database.create_user(dict(
-                id='Walter Harp'
-                ))
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START create_user]
+            :end-before: [END create_user]
+            :language: python
+            :dedent: 0
+            :caption: Create a database user:
+            :name: create_user
 
         """
         database = cast("Database", self)
@@ -751,6 +761,11 @@ class Container:
 
     :ivar str id: ID (name) of the container
     :ivar str session_token: The session token for the container.
+
+    .. note::
+
+        To create a new container in an existing database, use :func:`Database.create_container`.
+
     """
 
     def __init__(
@@ -793,6 +808,15 @@ class Container:
         :param session_token: Token for use with Session consistency.
         :param populate_query_metrics: Enable returning query metrics in response headers.
         :returns: :class:`Item`, if present in the container.
+
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START update_item]
+            :end-before: [END update_item]
+            :language: python
+            :dedent: 0
+            :caption: Get an item from the database and update one of its properties:
+            :name: update_item
+
         """
         doc_link = self._get_document_link(id)
 
@@ -893,24 +917,25 @@ class Container:
         :param populate_query_metrics: Enable returning query metrics in response headers.
         :returns: An `Iterator` containing each result returned by the query, if any.
 
-        **Example:** Find all families in the state of NY.
+        You can use any value for the container name in the FROM clause, but typically the container name is used.
+        In the examples below, the container name is "products," and is aliased as "p" for easier referencing
+        in the WHERE clause.
 
-        .. code-block:: python
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START query_items]
+            :end-before: [END query_items]
+            :language: python
+            :dedent: 0
+            :caption: Get all products that have not been discontinued:
+            :name: query_items
 
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = "NY"'
-            )
-
-        **Example:** Parameterized query to find all families in the state of NY.
-
-        .. code-block:: python
-
-            items = container.query_items(
-                query='SELECT * FROM Families f WHERE f.address.state = @addressState',
-                parameters=[
-                    dict(name='@addressState', value='NY')
-                ]
-            )
+        .. literalinclude:: ../../examples/examples.py
+            :start-after: [START query_items_param]
+            :end-before: [END query_items_param]
+            :language: python
+            :dedent: 0
+            :caption: Parameterized query to get all products that have been discontinued:
+            :name: query_items_param
 
         """
         request_options: "Dict[str, Any]" = {}
@@ -955,7 +980,7 @@ class Container:
     ) -> "Item":
         """ Replaces the specified item if it exists in the container.
 
-        :param body: A dict-like object or string representing the item to replace.
+        :param body: A dict-like object representing the item to replace.
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
@@ -992,7 +1017,7 @@ class Container:
     ) -> "Item":
         """ Insert or update the specified item.
 
-        :param body: A dict-like object or string representing the item to update or insert.
+        :param body: A dict-like object representing the item to update or insert.
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
@@ -1031,7 +1056,7 @@ class Container:
     ) -> "Item":
         """ Create an item in the container.
 
-        :param body: A dict-like object or string representing the item to create.
+        :param body: A dict-like object representing the item to create.
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
