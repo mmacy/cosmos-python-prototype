@@ -15,12 +15,16 @@ def do_basic_stuff():
             for item in container.list_items():
                 print(item)
 
-database = client.create_database("swaggers", fail_if_exists=False)
+try:
+    database = client.create_database("swaggers")
+except HTTPFailure:
+    database = client.get_database("swaggers")
+
 try:
     container = database.get_container(
         "publicmaster"
     )  # TODO: Why not have a fail_if_exists on every create?
-except ValueError:  # TODO: What is the appropriate exception here?
+except HTTPFailure:  # TODO: What is the appropriate exception here?
     container = database.create_container("publicmaster")
 
 import time
@@ -37,7 +41,7 @@ container = database.create_container(
     id='containerwithspecificsettings',
     partition_key={
         "paths": [
-        "/AccountNumber"
+        "/info/version"
         ],
         "kind": "Hash"
     }
@@ -64,7 +68,7 @@ def upload():
                     pass
 
 def find_stuff(query):
-    items = container.query_items(query)
+    items = container.query_items(query, enable_cross_partition_query=True)
 
     for item in items:
         item = container.get_item(item["id"])
