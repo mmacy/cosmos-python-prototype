@@ -1,8 +1,11 @@
 # Azure Cosmos DB SQL API SDK for Python
 
-Azure Cosmos DB is a multi-model database service that supports document, key-value, wide-column, and graph databases. Several APIs are supported, including SQL, MongoDB, Gremlin, Cassandra, and Azure Table.
+Use the Python SDK for Azure Cosmos DB (SQL API) to manage databases and the JSON documents you add them in this NoSQL database service.
 
-The Azure Cosmos DB SQL API SDK for Python enables you to manage database resources like containers (collections of JSON documents) and items (JSON documents), as well as query the documents in your database using familiar SQL-like syntax.
+* Create Cosmos DB **databases** and modify their settings
+* Create and modify **containers** to store collections of JSON documents
+* Create, read, update, and delete **items** (JSON documents) in containers
+* Query the documents in your database using **SQL-like syntax**
 
 ## Prerequisites
 
@@ -14,11 +17,11 @@ The Azure Cosmos DB SQL API SDK for Python enables you to manage database resour
 
 ## Installation
 
-The installation of the Azure Cosmos DB Python SDK involves installing packages via [pip][pip], optionally within a virtual environment via [venv][venv].
+Install the Azure Cosmos DB Python SDK with [pip][pip], optionally within a [virtual environment][venv].
 
 ### Configure a virtual environment (optional)
 
-Although not required, we recommend that you install the SDK within a Python virtual environment. By using a virtual environment, you can keep your your base system and Azure SDK environments isolated.
+Although not required, you can keep your your base system and Azure SDK environments isolated if you use a virtual environment.
 
 Execute the following commands to configure and then enter a virtual environment with [venv][venv]:
 

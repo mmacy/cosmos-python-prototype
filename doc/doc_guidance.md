@@ -16,6 +16,10 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 | [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
 | [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
 
+Here's a high-level overview of how these types of documentation relate to each other for a Python SDK:
+
+![Developer documentation types diagram][doc_diagram]
+
 > NOTE: The README is not yet ingested by docs.microsoft.com as the reference landing page. **This feature is planned**.
 
 ## README
@@ -103,3 +107,6 @@ The Open Publishing System (OPS) [Onboarding & Admin Guide][ops_guide] contains 
 [tool_docformatter]: https://github.com/PyCQA/pydocstyle
 [tool_flake8docstrings]: https://pypi.org/project/flake8-docstrings/
 [tool_pydocstyle]: https://pypi.org/project/docformatter/
+
+<!-- images -->
+[doc_diagram]: ./media/docs-sdk-properties_640x393.png
