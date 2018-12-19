@@ -16,7 +16,7 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 | [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
 | [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
 
-Here's a high-level overview of how these types of documentation relate to each other for a Python SDK:
+Here's a high-level overview of how these types of documentation relate to each other for a Python SDK. The arrows indicate automatic or semi-automatic content ingestion.
 
 ![Developer documentation types diagram][doc_diagram]
 
