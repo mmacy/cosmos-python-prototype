@@ -4,7 +4,7 @@ Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON 
 
 * Create Cosmos DB **databases** and modify their settings
 * Create and modify **containers** to store collections of JSON documents
-* Create, read, update, and delete the **items** (JSON documents)  your containers
+* Create, read, update, and delete the **items** (JSON documents) in your containers
 * Query the documents in your database using **SQL-like syntax**
 
 ## Prerequisites
