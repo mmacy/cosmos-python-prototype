@@ -18,6 +18,10 @@ There are three primary types of documentation for an Azure SDK. Two are the res
 
 > NOTE: The README is not yet ingested by docs.microsoft.com as the reference landing page. **This feature is planned**.
 
+Here's an overview of how these types of documentation relate to each other for a Python SDK. The arrows indicate automatic or semi-automatic content ingestion.
+
+![Developer documentation types diagram][doc_diagram]
+
 ## README
 
 The `README.md` is the entry point to your SDK. It's the welcome mat and front door, and should provide the quickest, easiest path for getting up and running with your SDK. It should be as brief as possible but as complete as necessary, enabling SDK users to perform the most common operations with the least amount of friction.
@@ -103,3 +107,6 @@ The Open Publishing System (OPS) [Onboarding & Admin Guide][ops_guide] contains 
 [tool_docformatter]: https://github.com/PyCQA/pydocstyle
 [tool_flake8docstrings]: https://pypi.org/project/flake8-docstrings/
 [tool_pydocstyle]: https://pypi.org/project/docformatter/
+
+<!-- images -->
+[doc_diagram]: ./media/docs-sdk-properties_640x393.png
