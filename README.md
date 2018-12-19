@@ -1,10 +1,10 @@
 # Azure Cosmos DB SQL API SDK for Python
 
-Use the Python SDK for Azure Cosmos DB (SQL API) to manage databases and the JSON documents you add them in this NoSQL database service.
+Use the Azure Cosmos DB SQL API SDK for Python for to manage databases and the JSON documents they contain in this NoSQL database service.
 
 * Create Cosmos DB **databases** and modify their settings
 * Create and modify **containers** to store collections of JSON documents
-* Create, read, update, and delete **items** (JSON documents) in containers
+* Create, read, update, and delete the **items** (JSON documents)  your containers
 * Query the documents in your database using **SQL-like syntax**
 
 ## Prerequisites
@@ -21,9 +21,7 @@ Install the Azure Cosmos DB Python SDK with [pip][pip], optionally within a [vir
 
 ### Configure a virtual environment (optional)
 
-Although not required, you can keep your your base system and Azure SDK environments isolated if you use a virtual environment.
-
-Execute the following commands to configure and then enter a virtual environment with [venv][venv]:
+Although not required, you can keep your your base system and Azure SDK environments isolated from one another if you use a virtual environment. Execute the following commands to configure and then enter a virtual environment with [venv][venv]:
 
 ```Bash
 python3 -m venv azure-cosmosdb-sdk-environment
@@ -40,11 +38,11 @@ pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https
 
 ## Authentication
 
-Interaction with Cosmos DB starts with an instance of the [CosmosClient][ref_cosmosclient] class. To create the [CosmosClient][ref_cosmosclient] object, supply your Cosmos DB account's URI and one of its account keys to the [CosmosClient][ref_cosmosclient] constructor.
+Interaction with Cosmos DB starts with an instance of the [CosmosClient][ref_cosmosclient] class. You need an **account**, its **URI**, and one of its **account keys** to instantiate the client object.
 
 ### Create Cosmos DB account
 
-If you need a Cosmos DB SQL API account, you can create one in the [Azure portal][cosmos_account_create], or with the following Azure CLI command.
+If you need a Cosmos DB SQL API account, you can create one in the [Azure portal][cosmos_account_create], or with the following [Azure CLI][azure_cli] command:
 
 ```Bash
 az cosmosdb create --resource-group <resource-group-name> --name <cosmos-account-name>
@@ -52,7 +50,7 @@ az cosmosdb create --resource-group <resource-group-name> --name <cosmos-account
 
 ### Get credentials
 
-You can get your account URI and account key in several ways, including with the [Azure CLI][azure_cli] and [Azure portal][azure_portal]. The Bash snippet below retrieves the account URI and its primary master key with the Azure CLI, and exports those values as environment variables.
+Use the Azure CLI snippet below to populate two environment variables with the database account URI and its primary master key (you can also find these values in the Azure portal). The snippet is formatted for the Bash shell.
 
 ```Bash
 RES_GROUP=<resource-group-name>
@@ -81,18 +79,19 @@ Once you've initialized a [CosmosClient][ref_cosmosclient], you can interact wit
 
 * [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
 * [Container][cosmos_container]: Each database in a Cosmos DB SQL API account houses one or more *containers*. A container is a collection of JSON documents (items), and is labeled a "Collection" in the Azure portal.
-* [Item][cosmos_item]: Containers hold one or more *items*. Items are the JSON documents in your containers, and labeled "Documents" in the Azure portal.
+* [Item][cosmos_item]: Containers hold one or more *items*. Items are the JSON documents in your containers, and are labeled "Documents" in the Azure portal.
 
 For more information on these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
 ## Examples
 
-The following sections provide several example code snippets covering some of the most common Cosmos DB tasks, including:
+The following sections provide several code snippets covering some of the most common Cosmos DB tasks, including:
 
 * [Create a database](#create-a-database)
 * [Create a container](#create-a-container)
 * [Get an existing container](#get-an-existing-container)
 * [Insert data](#insert-data)
+* [Delete data](#delete-data)
 * [Query the database](#query-the-database)
 * [Get database properties](#get-database-properties)
 * [Modify container properties](#modify-container-properties)
@@ -287,7 +286,9 @@ For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos
 [cosmos_ttl]: https://docs.microsoft.com/azure/cosmos-db/time-to-live
 [pip]: https://pypi.org/project/pip/
 [python]: https://www.python.org/downloads/
+[ref_container_delete_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.delete_item
 [ref_container_upsert_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.upsert_item
+[ref_cosmos_sdk]: http://cosmosproto.westus.azurecontainer.io
 [ref_cosmosclient]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient
 [ref_cosmosclient_create_database]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient.create_database
 [ref_httpfailure]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos.errors.httpfailure
