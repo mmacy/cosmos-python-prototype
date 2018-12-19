@@ -1,6 +1,6 @@
 # Azure Cosmos DB SQL API SDK for Python
 
-Use the Azure Cosmos DB SQL API SDK for Python for to manage databases and the JSON documents they contain in this NoSQL database service.
+Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON documents they contain in this NoSQL database service.
 
 * Create Cosmos DB **databases** and modify their settings
 * Create and modify **containers** to store collections of JSON documents
