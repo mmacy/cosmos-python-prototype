@@ -7,6 +7,12 @@ Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON 
 * Create, read, update, and delete the **items** (JSON documents) in your containers
 * Query the documents in your database using **SQL-like syntax**
 
+Related resources:
+
+* [Source code][source_code]
+* [API reference documentation][ref_cosmos_sdk]
+* [Cosmos DB on docs.microsoft.com][cosmos_docs]
+
 ## Prerequisites
 
 ### Required
@@ -293,6 +299,7 @@ For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos
 [ref_cosmosclient_create_database]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient.create_database
 [ref_httpfailure]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos.errors.httpfailure
 [ref_container_query_items]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.query_items
+[source_code]: https://github.com/binderjoe/cosmos-python-prototype
 [venv]: https://docs.python.org/3/library/venv.html
 [virtualenv]: https://virtualenv.pypa.io
 [sample_examples_misc]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/examples.py
