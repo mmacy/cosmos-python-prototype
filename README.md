@@ -9,7 +9,7 @@ Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON 
 
 Related resources:
 
-* [Source code][source_code]
+* [SDK source code][source_code]
 * [API reference documentation][ref_cosmos_sdk]
 * [Cosmos DB on docs.microsoft.com][cosmos_docs]
 
