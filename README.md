@@ -7,13 +7,23 @@ Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON 
 * Create, read, update, and delete the **items** (JSON documents) in your containers
 * Query the documents in your database using **SQL-like syntax**
 
-## Prerequisites
+Looking for source code or API reference?
 
-### Required
+* [SDK source code][source_code]
+* [SDK reference documentation][ref_cosmos_sdk]
+
+## Prerequisites
 
 * Azure subscription - [Create a free account][azure_sub]
 * Azure [Cosmos DB account][cosmos_account] - SQL API
 * [Python 3.6+][python]
+
+
+If you need a Cosmos DB SQL API account, you can create one with this [Azure CLI][azure_cli] command:
+
+```Bash
+az cosmosdb create --resource-group <resource-group-name> --name <cosmos-account-name>
+```
 
 ## Installation
 
@@ -39,14 +49,6 @@ pip install git+https://github.com/johanste/azure-cosmos-python.git@ux git+https
 ## Authentication
 
 Interaction with Cosmos DB starts with an instance of the [CosmosClient][ref_cosmosclient] class. You need an **account**, its **URI**, and one of its **account keys** to instantiate the client object.
-
-### Create Cosmos DB account
-
-If you need a Cosmos DB SQL API account, you can create one in the [Azure portal][cosmos_account_create], or with the following [Azure CLI][azure_cli] command:
-
-```Bash
-az cosmosdb create --resource-group <resource-group-name> --name <cosmos-account-name>
-```
 
 ### Get credentials
 
@@ -77,11 +79,13 @@ client = CosmosClient(url, key)
 
 Once you've initialized a [CosmosClient][ref_cosmosclient], you can interact with the primary resource types in Cosmos DB:
 
-* [Database][cosmos_database]: Each Cosmos DB account contains one or more databases. When you create the database, you specify the API you'd like to use when interacting with it: SQL, MongoDB, Gremlin, Cassandra, or Azure Table.
-* [Container][cosmos_container]: Each database in a Cosmos DB SQL API account houses one or more *containers*. A container is a collection of JSON documents (items), and is labeled a "Collection" in the Azure portal.
-* [Item][cosmos_item]: Containers hold one or more *items*. Items are the JSON documents in your containers, and are labeled "Documents" in the Azure portal.
+* [Database][ref_database]: A Cosmos DB account can contain multiple databases. When you create a database, you specify the API you'd like to use when interacting with its documents: SQL, MongoDB, Gremlin, Cassandra, or Azure Table. Use the [Database][ref_database] object to manage its containers.
 
-For more information on these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
+* [Container][ref_container]: A container is a collection of JSON documents. You create (insert), read, update, and delete items in a container by using methods on the [Container][ref_container] object.
+
+* [Item][ref_item]: An Item is the dictionary-like representation of a JSON document stored in a container. Each Item you add to a container must have an `id` field whose value is unique within the container. If you add an item to a container without specifying a unique ID, Cosmos DB creates one for you in the form of a GUID.
+
+For more information about these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
 ## Examples
 
@@ -268,33 +272,37 @@ For more extensive documentation on the Cosmos DB service, see the [Azure Cosmos
 
 <!-- LINKS -->
 [azure_cli]: https://docs.microsoft.com/cli/azure
-[azure_portal]: https://portal.azure.com
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
+[azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
-[cosmos_account]: https://docs.microsoft.com/azure/cosmos-db/account-overview
 [cosmos_account_create]: https://docs.microsoft.com/azure/cosmos-db/how-to-manage-database-account
+[cosmos_account]: https://docs.microsoft.com/azure/cosmos-db/account-overview
 [cosmos_container]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-containers
 [cosmos_database]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-databases
 [cosmos_docs]: https://docs.microsoft.com/azure/cosmos-db/
 [cosmos_http_status_codes]: https://docs.microsoft.com/rest/api/cosmos-db/http-status-codes-for-cosmosdb
 [cosmos_item]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items#azure-cosmos-items
-[cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items
 [cosmos_request_units]: https://docs.microsoft.com/azure/cosmos-db/request-units
+[cosmos_resources]: https://docs.microsoft.com/azure/cosmos-db/databases-containers-items
 [cosmos_sql_queries]: https://docs.microsoft.com/azure/cosmos-db/how-to-sql-query
 [cosmos_ttl]: https://docs.microsoft.com/azure/cosmos-db/time-to-live
 [pip]: https://pypi.org/project/pip/
 [python]: https://www.python.org/downloads/
 [ref_container_delete_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.delete_item
-[ref_container_upsert_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.upsert_item
-[ref_cosmos_sdk]: http://cosmosproto.westus.azurecontainer.io
-[ref_cosmosclient]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient
-[ref_cosmosclient_create_database]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient.create_database
-[ref_httpfailure]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos.errors.httpfailure
 [ref_container_query_items]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.query_items
-[venv]: https://docs.python.org/3/library/venv.html
-[virtualenv]: https://virtualenv.pypa.io
-[sample_examples_misc]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/examples.py
+[ref_container_upsert_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container.upsert_item
+[ref_container]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Container
+[ref_cosmos_sdk]: http://cosmosproto.westus.azurecontainer.io
+[ref_cosmosclient_create_database]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient.create_database
+[ref_cosmosclient]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.CosmosClient
+[ref_database]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Database
+[ref_httpfailure]: https://docs.microsoft.com/python/api/azure-cosmos/azure.cosmos.errors.httpfailure
+[ref_item]: http://cosmosproto.westus.azurecontainer.io/#azure.cosmos.Item
 [sample_database_mgmt]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/databasemanagementsample.py
 [sample_document_mgmt]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/documentmanagementsample.py
+[sample_examples_misc]: https://github.com/binderjoe/cosmos-python-prototype/blob/master/examples/examples.py
+[source_code]: https://github.com/binderjoe/cosmos-python-prototype
+[venv]: https://docs.python.org/3/library/venv.html
+[virtualenv]: https://virtualenv.pypa.io
