@@ -382,8 +382,8 @@ class Database:
     def create_container(
         self,
         id: str,
+        partition_key: "PartitionKey",
         *,
-        partition_key: "Optional[PartitionKey]" = None,
         indexing_policy: "Optional[Dict[str, Any]]" = None,
         default_ttl: "int" = None,
         disable_ru_per_minute_usage: "Optional[bool]" = None,
@@ -391,6 +391,7 @@ class Database:
         initial_headers: "Optional[Dict[str, Any]]" = None,
         access_condition: "Optional[AccessCondition]" = None,
         populate_query_metrics: "Optional[bool]" = None,
+        offer_throughput: "Optional[int]" = None,
     ) -> "Container":
         """
         Create a new container with the given ID (name).
@@ -405,6 +406,7 @@ class Database:
         :param session_token: Token for use with Session consistency.
         :param access_condition: Conditions Associated with the request.
         :param populate_query_metrics: Enable returning query metrics in response headers.
+        :param offer_throughput: The provisioned throughput for this offer.
 
         :raise HTTPFailure: The container creation failed.
 
@@ -633,11 +635,11 @@ class Database:
             result, metadata=ResponseMetadata(self.client_context.last_response_headers)
         )
 
-    def set_container_properties(
+    def reset_container_properties(
         self,
         container: "Union[str, Container]",
+        partition_key: "PartitionKey",
         *,
-        partition_key: "Optional[PartitionKey]" = None,
         indexing_policy=None,
         default_ttl=None,
         conflict_resolution_policy=None,
@@ -647,7 +649,9 @@ class Database:
         access_condition: "Optional[AccessCondition]" = None,
         populate_query_metrics: "Optional[bool]" = None,
     ):
-        """ Update the properties of the container. Property changes are persisted immediately.
+        """ Reset the properties of the container. Property changes are persisted immediately.
+
+        Any properties not specified will be reset to their default values.
 
         :param disable_ru_per_minute_usage: Enable/disable Request Units(RUs)/minute capacity to serve the request if regular provisioned RUs/second is exhausted.
         :param session_token: Token for use with Session consistency.
@@ -655,12 +659,12 @@ class Database:
         :param populate_query_metrics: Enable returning query metrics in response headers.
 
         .. literalinclude:: ../../examples/examples.py
-            :start-after: [START set_container_properties]
-            :end-before: [END set_container_properties]
+            :start-after: [START reset_container_properties]
+            :end-before: [END reset_container_properties]
             :language: python
             :dedent: 0
-            :caption: Set the TTL property on a container, and display the updated properties:
-            :name: set_container_properties
+            :caption: Reset the TTL property on a container, and display the updated properties:
+            :name: reset_container_properties
 
         """
         container_id = getattr(container, "id", container)
@@ -792,8 +796,8 @@ class Container:
     def get_item(
         self,
         id: "str",
+        partition_key: "str",
         *,
-        partition_key: "Optional[str]" = None,
         disable_ru_per_minute_usage: "Optional[bool]" = None,
         session_token: "Optional[str]" = None,
         initial_headers: "Optional[Dict[str, Any]]" = None,
@@ -1090,8 +1094,8 @@ class Container:
     def delete_item(
         self,
         item: "Union[Item, Dict[str, Any], str]",
+        partition_key: "str",
         *,
-        partition_key: "Optional[str]" = None,
         disable_ru_per_minute_usage: "Optional[bool]" = None,
         max_degree_parallelism: "Optional[int]" = None,
         session_token: "Optional[str]" = None,
