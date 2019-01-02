@@ -1,7 +1,7 @@
 # Sample code
 import os
 
-from azure.cosmos import CosmosClient, HTTPFailure
+from azure.cosmos import CosmosClient, HTTPFailure, PartitionKey
 
 AUTH_URI = os.environ["ACCOUNT_URI"]
 AUTH_KEY = os.environ["ACCOUNT_KEY"]
@@ -21,16 +21,20 @@ except HTTPFailure:
     database = client.get_database("swaggers")
 
 try:
+    database.delete_container('publicmaster')
+except:
+    pass
+    
+try:
     container = database.get_container(
         "publicmaster"
     )  # TODO: Why not have a fail_if_exists on every create?
 except HTTPFailure:  # TODO: What is the appropriate exception here?
-    container = database.create_container("publicmaster")
+    container = database.create_container("publicmaster", partition_key=PartitionKey('/info/version'))
 
 import time
 
-
-database.set_container_properties(container, default_ttl=time.time() + 60 * 60)
+database.reset_container_properties(container, partition_key=PartitionKey('/info/version'), default_ttl=time.time() + 60 * 60)
 
 try:
     database.delete_container('containerwithspecificsettings')
@@ -71,26 +75,22 @@ def find_stuff(query):
     items = container.query_items(query, enable_cross_partition_query=True)
 
     for item in items:
-        item = container.get_item(item["id"])
+        item = container.get_item(item["id"], partition_key=item['info']['version'])
         print(str(item)[0:50])
 
-def clear_stuff():
-    for item in container.list_items():
-        id = item["id"]
-        if ":examples:" in id:
-            print(f"deleting {id}")
-            container.delete_item(item)
-        else:
-            print(f"leaving {id}")
+def clear_stuff(query):
+    for item in container.query_items(query):
+        print(f"deleting {item['id']}")
+        container.delete_item(item, partition_key=item['info']['version'])
 
 query = """
     SELECT * FROM root s
-    WHERE s.info.version = '2018-01-01'
+    WHERE s.info.version = '2018-06-01'
     """
 
 do_basic_stuff()
 upload()
-clear_stuff()
+clear_stuff(query)
 find_stuff(query)
 
 
