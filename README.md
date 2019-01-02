@@ -83,7 +83,7 @@ Once you've initialized a [CosmosClient][ref_cosmosclient], you can interact wit
 
 * [Container][ref_container]: A container is a collection of JSON documents. You create (insert), read, update, and delete items in a container by using methods on the [Container][ref_container] object.
 
-* [Item][ref_item]: An Item is the dictionary-like representation of a JSON document stored in a container. Each Item you add to a container must have an `id` field whose value is unique within the container. If you add an item to a container without specifying a unique ID, Cosmos DB creates one for you in the form of a GUID.
+* [Item][ref_item]: An Item is the dictionary-like representation of a JSON document stored in a container. Each Item you add to a container must have an `id` field whose value is unique within the container. If you add an item to a container without including an `id` field, Cosmos DB creates one for you in the form of a GUID.
 
 For more information about these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
