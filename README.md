@@ -67,7 +67,7 @@ export ACCOUNT_KEY=$(az cosmosdb list-keys --resource-group $RES_GROUP --name $A
 Once you've populated the `ACCOUNT_URI` and `ACCOUNT_KEY` environment variables, you can create the [CosmosClient][ref_cosmosclient].
 
 ```Python
-from azure.cosmos import HTTPFailure, CosmosClient, Container, Database
+from azure.cosmos import HTTPFailure, CosmosClient, Container, Database, PartitionKey
 
 import os
 url = os.environ['ACCOUNT_URI']
@@ -106,7 +106,12 @@ After authenticating your [CosmosClient][ref_cosmosclient], you can work with an
 
 ```Python
 database_name = 'testDatabase'
-database = client.create_database(id=database_name, fail_if_exists=False)
+try:
+    database = client.create_database(id=database_name)
+except HTTPFailure as e:
+    if e.status_code != 409:
+        raise
+    database = client.get_database(id=database_name)
 ```
 
 ### Create a container
@@ -116,7 +121,7 @@ This example creates a container with default settings. If a container with the 
 ```Python
 container_name = 'products'
 try:
-    container = database.create_container(id=container_name)
+    container = database.create_container(id=container_name, partition_key=PartitionKey(path="/productName")
 except HTTPFailure as e:
     if e.status_code != 409:
         raise
@@ -159,7 +164,7 @@ To delete items from a container, use [Container.delete_item][ref_container_dele
 
 ```Python
 for item in container.query_items(query='SELECT * FROM products p WHERE p.productModel = "DISCONTINUED"'):
-    container.delete_item(item)
+    container.delete_item(item, partition_key='Pager')
 ```
 
 ### Query the database
@@ -174,7 +179,9 @@ container = database.get_container(container_name)
 
 # Enumerate the returned items
 import json
-for item in container.query_items(query='SELECT * FROM mycontainer r WHERE r.id="something"'):
+for item in container.query_items(
+                query='SELECT * FROM mycontainer r WHERE r.id="something"',
+                enable_cross_partition_query=True):
     print(json.dumps(item, indent=True))
 ```
 
@@ -187,7 +194,8 @@ discontinued_items = container.query_items(
     query='SELECT * FROM products p WHERE p.productModel = @model',
     parameters=[
         dict(name='@model', value='DISCONTINUED')
-    ]
+    ],
+    enable_cross_partition_query=True
 )
 for item in discontinued_items:
     print(json.dumps(item, indent=True))
@@ -212,7 +220,9 @@ Certain properties of an existing container can be modified. This example sets t
 ```Python
 database = client.get_database(database_name)
 container = database.get_container(container_name)
-database.set_container_properties(container, default_ttl=10)
+database.reset_container_properties(container, 
+    default_ttl=10,
+    partition_key=PartitionKey(path="/productName"))
 
 # Display the new TTL setting for the container
 container_props = database.get_container(container_name).properties
@@ -233,7 +243,7 @@ For example, if you try to create a container using an ID (name) that's already 
 
 ```Python
 try:
-    database.create_container(id=container_name)
+    database.create_container(id=container_name, partition_key=PartitionKey(path="/productName")
 except HTTPFailure as e:
     if e.status_code == 409:
         print("""Error creating container.

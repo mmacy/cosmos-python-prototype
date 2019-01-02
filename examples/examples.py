@@ -18,7 +18,7 @@ client = CosmosClient(url, key)
 # specifying that the operation shouldn't throw an exception
 # if a database with the given ID already exists.
 # [START create_database]
-database_name = 'testDatabase'
+database_name = "testDatabase"
 try:
     database = client.create_database(id=database_name)
 except HTTPFailure:
@@ -28,9 +28,11 @@ except HTTPFailure:
 # Create a container, handling the exception if a container with the
 # same ID (name) already exists in the database.
 # [START create_container]
-container_name = 'products'
+container_name = "products"
 try:
-    container = database.create_container(id=container_name)
+    container = database.create_container(
+        id=container_name, partition_key=PartitionKey(path="/productName")
+    )
 except HTTPFailure as e:
     if e.status_code != 409:
         raise
@@ -40,11 +42,11 @@ except HTTPFailure as e:
 # Create a container with custom settings. This example
 # creates a container with a custom partition key.
 # [START create_container_with_settings]
-customer_container_name = 'customers'
+customer_container_name = "customers"
 try:
     customer_container = database.create_container(
         id=customer_container_name,
-        partition_key=PartitionKey(path="/productName"),
+        partition_key=PartitionKey(path="/city"),
         default_ttl=200,
     )
 except HTTPFailure as e:
@@ -62,32 +64,29 @@ try:
     container = database.get_container(container_name)
 except HTTPFailure as failure:
     if failure.status_code == 404:
-        print('Container does not exist.')
+        print("Container does not exist.")
     else:
-        print(f'Failed to retrieve container. Status code:{failure.status_code}')
+        print(f"Failed to retrieve container. Status code:{failure.status_code}")
 # [END get_container]
 
 # [START list_containers]
 database = client.get_database(database_name)
 for container in database.list_containers():
-    print(f'Container ID: {container.id}')
+    print(f"Container ID: {container.id}")
 # [END list_containers]
 
 # Insert new items by defining a dict and calling Container.upsert_item
 # [START upsert_items]
 for i in range(1, 10):
-    container.upsert_item(dict(
-        id=f'item{i}',
-        productName='Widget',
-        productModel=f'Model {i}'
-        )
+    container.upsert_item(
+        dict(id=f"item{i}", productName="Widget", productModel=f"Model {i}")
     )
 # [END upsert_items]
 
 # Modify an existing item in the container
 # [START update_item]
-item = container.get_item('item2')
-item['productModel'] = 'DISCONTINUED'
+item = container.get_item("item2", partition_key="Widget")
+item["productModel"] = "DISCONTINUED"
 updated_item = container.upsert_item(item)
 # [END update_item]
 
@@ -95,7 +94,11 @@ updated_item = container.upsert_item(item)
 # gets all items whose product model hasn't been discontinued.
 # [START query_items]
 import json
-for item in container.query_items(query='SELECT * FROM products p WHERE p.productModel <> "DISCONTINUED"'):
+
+for item in container.query_items(
+    query='SELECT * FROM products p WHERE p.productModel <> "DISCONTINUED"',
+    enable_cross_partition_query=True,
+):
     print(json.dumps(item, indent=True))
 # [END query_items]
 
@@ -103,10 +106,8 @@ for item in container.query_items(query='SELECT * FROM products p WHERE p.produc
 # gets all items whose product model has been discontinued.
 # [START query_items_param]
 discontinued_items = container.query_items(
-    query='SELECT * FROM products p WHERE p.productModel = @model',
-    parameters=[
-        dict(name='@model', value='DISCONTINUED')
-    ]
+    query='SELECT * FROM products p WHERE p.productModel = @model AND p.productName="Widget"',
+    parameters=[dict(name="@model", value="DISCONTINUED")],
 )
 for item in discontinued_items:
     print(json.dumps(item, indent=True))
@@ -117,8 +118,10 @@ for item in discontinued_items:
 # so deletes must be done with the delete_item method
 # on the container.
 # [START delete_items]
-for item in container.query_items(query='SELECT * FROM products p WHERE p.productModel = "DISCONTINUED"'):
-    container.delete_item(item)
+for item in container.query_items(
+    query='SELECT * FROM products p WHERE p.productModel = "DISCONTINUED" AND p.productName="Widget"'
+):
+    container.delete_item(item, partition_key="Widget")
 # [END delete_items]
 
 # Retrieve the properties of a database
@@ -131,24 +134,22 @@ print(json.dumps(properties, indent=True))
 # This example sets the default time to live (TTL) for items in the
 # container to 3600 seconds (1 hour). An item in container is deleted
 # when the TTL has elapsed since it was last edited.
-# [START set_container_properties]
+# [START reset_container_properties]
 # Set the TTL on the container to 3600 seconds (one hour)
-database.set_container_properties(container, default_ttl=3600)
+database.reset_container_properties(container, partition_key=PartitionKey(path='/productName'), default_ttl=3600)
 
 # Display the new TTL setting for the container
 container_props = database.get_container(container_name).properties
 print(f"New container TTL: {json.dumps(container_props['defaultTtl'])}")
-# [END set_container_properties]
+# [END reset_container_properties]
 
 # Create a user in the database.
 # [START create_user]
 try:
-    database.create_user(dict(
-        id='Walter Harp'
-        ))
+    database.create_user(dict(id="Walter Harp"))
 except HTTPFailure as failure:
     if failure.status_code == 409:
-        print('A user with that ID already exists.')
+        print("A user with that ID already exists.")
     else:
-        print(f'Failed to create user. Status code:{failure.status_code}')
+        print(f"Failed to create user. Status code:{failure.status_code}")
 # [END create_user]
