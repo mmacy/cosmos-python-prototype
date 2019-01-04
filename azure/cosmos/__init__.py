@@ -87,8 +87,13 @@ class CosmosClient:
     ):
         """ Instantiate a new CosmosClient.
 
-        :param url: The URL of the Cosmos DB account.
-        :param consistency_level: Consistency level to use for the session.
+        :param url: The URL of the Cosmos DB account in the format :code:`https://{ACCOUNT_NAME}.documents.azure.com:443/`.
+        :param key: A primary or secondary read-write or read-only account key for the Cosmos DB account.
+        :param consistency_level: The consistency level for the client session which specifies read and write
+                                  operation guarantees.
+        :param connection_policy: The :class:`azure.cosmos.documents.ConnectionPolicy` for the client session,
+                                  which includes options for connection mode, connection protocol, retry options,
+                                  and more.
 
         .. literalinclude:: ../../examples/examples.py
             :start-after: [START create_client]
