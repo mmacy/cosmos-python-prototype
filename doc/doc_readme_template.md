@@ -1,6 +1,6 @@
 # README.md template
 
-SDK READMEs can vary in content, coverage, and length, but should include these sections:
+SDK READMEs can vary in content, coverage, and length, but should include these sections. Use the following guidelines for each README section to ensure consistency and readability.
 
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
@@ -11,9 +11,7 @@ SDK READMEs can vary in content, coverage, and length, but should include these 
 * [Troubleshooting](#troubleshooting)
 * [Next steps](#next-steps)
 
-Use the following section guidelines to ensure consistency and readability.
-
-A example README that implements this guidance is the [Cosmos DB SQL API SDK for Python README](https://github.com/binderjoe/cosmos-python-prototype/blob/master/README.md).
+For guidance on other types of SDK documentation, include API reference, see [Document your SDK](doc_guidance.md).
 
 ## Introduction
 

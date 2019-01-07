@@ -1,5 +1,7 @@
 # Azure Cosmos DB SQL API SDK for Python
 
+Azure Cosmos DB is a globally distributed, multi-model database service that supports document, key-value, wide-column, and graph databases.
+
 Use the Azure Cosmos DB SQL API SDK for Python to manage databases and the JSON documents they contain in this NoSQL database service.
 
 * Create Cosmos DB **databases** and modify their settings
@@ -83,7 +85,7 @@ Once you've initialized a [CosmosClient][ref_cosmosclient], you can interact wit
 
 * [Container][ref_container]: A container is a collection of JSON documents. You create (insert), read, update, and delete items in a container by using methods on the [Container][ref_container] object.
 
-* [Item][ref_item]: An Item is the dictionary-like representation of a JSON document stored in a container. Each Item you add to a container must include an `id` field whose value is unique within the container.
+* [Item][ref_item]: An Item is the dictionary-like representation of a JSON document stored in a container. Each Item you add to a container must include an `id` key with a value that uniquely identifies the item within the container.
 
 For more information about these resources, see [Working with Azure Cosmos databases, containers and items][cosmos_resources].
 
@@ -141,7 +143,7 @@ container = database.get_container(container_name)
 
 ### Insert data
 
-To insert items into a container, pass a dictionary containing your data to [Container.upsert_item][ref_container_upsert_item]. Each item must include an `id` field whose value is unique within the container.
+To insert items into a container, pass a dictionary containing your data to [Container.upsert_item][ref_container_upsert_item]. Each item you add to a container must include an `id` key with a value that uniquely identifies the item within the container.
 
 This example inserts several items into the container, each with a unique `id`:
 
