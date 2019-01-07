@@ -18,7 +18,7 @@ There are three primary types of documentation for an Azure SDK as shown in the 
 
 > NOTE: The "Owner(s)" column identifies *typical* ownership for each type--we build the experience and ensure its quality **as one team**.
 
-Here's an overview of how these types of documentation relate to each other for a Python SDK. The arrows indicate automatic or semi-automatic content ingestion.
+Here's an overview of how these types of documentation relate to each other for a Python SDK; arrows indicate automatic content ingestion:
 
 ![Developer documentation types diagram][doc_diagram]
 
@@ -109,4 +109,4 @@ The Open Publishing System (OPS) [Onboarding & Admin Guide][ops_guide] contains 
 [tool_pydocstyle]: https://pypi.org/project/docformatter/
 
 <!-- images -->
-[doc_diagram]: ./media/docs-sdk-properties_640x393.png
+[doc_diagram]: ./media/docs-sdk-properties.png
