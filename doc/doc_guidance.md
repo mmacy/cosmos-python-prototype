@@ -12,8 +12,8 @@ There are three primary types of documentation for an Azure SDK as shown in the 
 
 | Type | Description | Owner(s) | Example(s) |
 | -- | -- | -- | -- |
-| [README](#readme) | `README.md` in the root of the SDK repository, used for:<ul><li>SDK README (GitHub)</li><li>Quickstart (docs.microsoft.com)</li><li>Landing page - SDK reference (docs.microsoft.com)</li><li>Landing page - package distro page (NuGet, PyPi, etc.)</li></ul> | Content developer, product PM | [Cosmos DB Python SDK README](../README.md) |
-| [Reference](#reference) | API reference documentation for the its types and their members. Auto-generated from the comments in the SDK source code. Includes code snippets ingested by and displayed in the published reference documentation. | Product team, Azure SDK team | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] + [examples.py](../examples/examples.py) |
+| [README](#readme) | `README.md` in the root of the SDK repository, used for:<br /><ul><li>SDK README (GitHub)</li><li>Quickstart (docs.microsoft.com)</li><li>Landing page - SDK reference (docs.microsoft.com)</li><li>Landing page - package distro page (NuGet, PyPi, etc.)</li></ul> | Content developer, product PM | [Cosmos DB Python SDK README](../README.md) |
+| [Reference](#reference) | API reference documentation for the its types and their members. Auto-generated from the comments in the SDK source code. Includes code snippets ingested by and displayed in the published reference documentation. | Product team, Azure SDK team | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] & [`examples.py`](../examples/examples.py) |
 | [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, product PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
 
 > NOTE: The "Owner(s)" column identifies *typical* ownership for each type--we build the experience and ensure its quality **as one team**.
