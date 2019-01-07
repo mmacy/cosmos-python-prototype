@@ -77,6 +77,7 @@ for container in database.list_containers():
 
 # Insert new items by defining a dict and calling Container.upsert_item
 # [START upsert_items]
+container = database.get_container(container_name)
 for i in range(1, 10):
     container.upsert_item(
         dict(id=f"item{i}", productName="Widget", productModel=f"Model {i}")

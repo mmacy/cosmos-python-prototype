@@ -1,6 +1,6 @@
 # README.md template
 
-SDK READMEs can vary in content, coverage, and length, but should include these sections:
+SDK READMEs can vary in content, coverage, and length, but should include these sections. Use the following guidelines for each README section to ensure consistency and readability.
 
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
@@ -11,19 +11,18 @@ SDK READMEs can vary in content, coverage, and length, but should include these 
 * [Troubleshooting](#troubleshooting)
 * [Next steps](#next-steps)
 
-Use the following general guidelines for each section to ensure consistency and readability.
+For guidance on other types of SDK documentation, include API reference, see [Document your SDK](doc_guidance.md).
 
 ## Introduction
 
-The introduction appears directly under the title (H1) of your README. Do not use an "Introduction" or "Overview" heading (H2).
+The introduction appears directly under the title (H1) of your README. Do not use "Introduction" or "Overview" headings (H2).
 
-* Begin the first sentence with the standard phrase "The `<SDK name>` SDK..."
-* Use an active verb after the standard phrase, such as "The Azure Batch SDK contains..." or "The Azure Batch SDK provides..."
-* Use the first sentence to describe the functionality of the SDK.
-* Use subsequent sentences to provide additional information. Provide enough information so that users of your SDK know whether they can complete their task using the SDK:
-  * Include a list of tasks supported by the SDK.
-  * Include a link, preferably near the top of the topic, to conceptual content that explains the use of the SDK in more detail.
-  * Do not repeat content found in the conceptual topics.
+* Use the first sentence to describe the functionality of the SDK. Use subsequent sentences to provide enough information so that users of your SDK know whether they can complete their task using the SDK.
+* Include a list of tasks supported by the SDK.
+* Do not repeat content found in the conceptual topics.
+* Include a links to:
+  * SDK source code (github.com)
+  * SDK reference documentation (docs.microsoft.com)
 
 ## Prerequisites
 

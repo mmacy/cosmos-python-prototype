@@ -750,6 +750,7 @@ class Item(dict):
     """ Represents a document in an Azure Cosmos DB SQL API container.
 
     To create, read, update, and delete Items, use the associated methods on the :class:`Container`.
+    The Item must include an `id` key with a value that uniquely identifies the item within the container.
     """
 
     def __init__(self, headers: "Dict[str, Any]", data: "Dict[str, Any]"):
