@@ -1,6 +1,6 @@
 # README.md template
 
-SDK READMEs can vary in content, coverage, and length, but should include these sections:
+SDK READMEs can vary in content, coverage, and length, but should include these sections. Use the following guidelines for each README section to ensure consistency and readability.
 
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
@@ -11,7 +11,7 @@ SDK READMEs can vary in content, coverage, and length, but should include these 
 * [Troubleshooting](#troubleshooting)
 * [Next steps](#next-steps)
 
-Use the following general guidelines for each section to ensure consistency and readability.
+For guidance on other types of SDK documentation, include API reference, see [Document your SDK](doc_guidance.md).
 
 ## Introduction
 
