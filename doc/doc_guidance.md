@@ -8,15 +8,15 @@ Provide clear, complete, and up-to-date documentation for your SDK to make your 
 
 ## Documentation deliverables
 
-There are three primary types of documentation for an Azure SDK. Two are the responsibility of the Azure SDK and product teams, the third lies with content developers (the "docs team"), product PMs, and even the public. However, we build the experience and ensure its quality **as one team**.
+There are three primary types of documentation for an Azure SDK as shown in the following table.
 
-| Type | Description | Owner | Example |
+| Type | Description | Owner(s) | Example |
 | -- | -- | -- | -- |
-| [README](#readme) | `README.md` file in the root of the SDK repository. Ingested by docs.microsoft.com and displayed as the SDK's "landing page." See NOTE below.  | SDK author (product/SDK team)| [Cosmos DB Python SDK README](../README.md) |
-| [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | SDK author (product/SDK team) | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
-| [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
+| [README](#readme) | `README.md` in the root of the SDK repository. This file is used for:<ul><li>SDK README (GitHub)</li><li>Quickstart (docs.microsoft.com)</li><li>Landing page - SDK reference (docs.microsoft.com)</li><li>Landing page - package distro page (NuGet, PyPi, etc.)</li></ul> | Content developer, product PM | [Cosmos DB Python SDK README](../README.md) |
+| [Reference](#reference) | API reference documentation for the SDK's types and their members. Auto-generated from the comments in the SDK source code. | Product team, Azure SDK team | [Cosmos DB Python SDK reference][docs_api_ref_cosmosdb] |
+| [Conceptual](#conceptual) | Long-form technical documentation for the service. Concepts, quickstarts, tutorials, and how-tos. | Content developer, product PM, public | [Cosmos DB documentation][azure_docs_cosmos] |
 
-> NOTE: The README is not yet ingested by docs.microsoft.com as the reference landing page. **This feature is planned**.
+> NOTE: The "Owner(s)" column identifies *typical* ownership for each type--we build the experience and ensure its quality **as one team**.
 
 Here's an overview of how these types of documentation relate to each other for a Python SDK. The arrows indicate automatic or semi-automatic content ingestion.
 
